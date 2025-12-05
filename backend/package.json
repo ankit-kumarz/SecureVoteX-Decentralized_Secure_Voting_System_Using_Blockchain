@@ -5,7 +5,8 @@
   "main": "src/server.js",
   "scripts": {
     "dev": "nodemon src/server.js",
-    "start": "node src/server.js",
+    "start": "node production-start.js",
+    "start:blockchain": "node railway-start.js",
     "migrate": "knex migrate:latest",
     "build": "echo 'Build complete - skipping hardhat compile for production'"
   },
@@ -16,6 +17,8 @@
     "express": "^4.18.2",
     "express-rate-limit": "^7.1.5",
     "express-session": "^1.17.3",
+    "hardhat": "^2.22.15",
+    "ethers": "^6.13.4",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "knex": "^2.5.1",
