@@ -1,0 +1,45 @@
+{
+  "name": "blockchain-voting-backend",
+  "version": "1.0.0",
+  "description": "Decentralized Blockchain Voting System Backend (Node.js + Express + PostgreSQL)",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "migrate": "knex migrate:latest"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "express-session": "^1.17.3",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "knex": "^2.5.1",
+    "multer": "^2.0.2",
+    "node-fetch": "^2.7.0",
+    "node-forge": "^1.3.1",
+    "pg": "^8.11.3",
+    "web3": "^4.5.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.8",
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.12",
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.11",
+    "@typechain/ethers-v6": "^0.5.1",
+    "@typechain/hardhat": "^9.1.0",
+    "@types/chai": "^4.3.20",
+    "@types/mocha": "^10.0.10",
+    "chai": "^4.5.0",
+    "ethers": "^6.13.4",
+    "hardhat": "^2.22.15",
+    "hardhat-gas-reporter": "^1.0.10",
+    "nodemon": "^3.0.3",
+    "solidity-coverage": "^0.8.13",
+    "typechain": "^8.3.2"
+  }
+}
