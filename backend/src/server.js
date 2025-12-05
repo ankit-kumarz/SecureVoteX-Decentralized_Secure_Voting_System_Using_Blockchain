@@ -21,7 +21,11 @@ const app = express();
 
 // CORS configuration - must be before helmet
 app.use(cors({ 
-  origin: 'http://localhost:3000',
+  origin: [
+    'http://localhost:3000',
+    'https://securevotex.vercel.app',
+    /\.vercel\.app$/  // Allow all Vercel preview deployments
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
