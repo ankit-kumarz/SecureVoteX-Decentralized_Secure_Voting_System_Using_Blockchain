@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
-    "migrate": "knex migrate:latest"
+    "migrate": "knex migrate:latest",
+    "build": "npx hardhat compile"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",
@@ -37,7 +38,7 @@
     "chai": "^4.5.0",
     "ethers": "^6.13.4",
     "hardhat": "^2.22.15",
-    "hardhat-gas-reporter": "^1.0.10",
+    "hardhat-gas-reporter": "^2.3.0",
     "nodemon": "^3.0.3",
     "solidity-coverage": "^0.8.13",
     "typechain": "^8.3.2"

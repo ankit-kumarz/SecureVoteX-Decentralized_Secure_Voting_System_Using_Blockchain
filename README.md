@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # SecureVoteX - Blockchain Voting Platform
 
 ## 📋 Table of Contents
@@ -1657,3 +1658,6 @@ SOFTWARE.
 **Built with ❤️ for Democratic Governance**
 
 *SecureVoteX - Where Every Vote Counts, Verified on the Blockchain*
+=======
+# Decentralized_Secure_Voting_System_Using_Blockchain
+>>>>>>> 2a49593608cfe9b83c9b2e2c5a2174e81f870d83
