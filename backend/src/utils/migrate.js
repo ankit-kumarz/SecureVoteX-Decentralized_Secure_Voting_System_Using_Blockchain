@@ -8,6 +8,13 @@ async function runMigrations() {
   const db = knex(knexConfig.development);
   
   try {
+    // If FORCE_MIGRATE is true, rollback all and re-run
+    if (process.env.FORCE_MIGRATE === 'true') {
+      console.log('⚠️  FORCE_MIGRATE enabled - Rolling back all migrations...');
+      await db.migrate.rollback(null, true); // Rollback all
+      console.log('✅ Rollback complete');
+    }
+    
     // Run migrations
     await db.migrate.latest();
     console.log('✅ Database migrations completed successfully');
