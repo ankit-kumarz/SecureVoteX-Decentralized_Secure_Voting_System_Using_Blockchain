@@ -75,24 +75,78 @@ async function initializeDatabase() {
       console.log('✅ elections table already exists');
     }
 
-    // Check if votes table exists
-    const hasVotesTable = await db.schema.hasTable('votes');
-    if (!hasVotesTable) {
-      console.log('📝 Creating votes table...');
-      await db.schema.createTable('votes', (table) => {
+    // Check if candidates table exists
+    const hasCandidatesTable = await db.schema.hasTable('candidates');
+    if (!hasCandidatesTable) {
+      console.log('📝 Creating candidates table...');
+      await db.schema.createTable('candidates', (table) => {
         table.increments('id').primary();
-        table.integer('voter_id').unsigned().notNullable();
         table.integer('election_id').unsigned().notNullable();
-        table.integer('candidate_id').unsigned();
-        table.string('encrypted_vote');
-        table.string('blockchain_tx');
+        table.string('name').notNullable();
+        table.text('description');
+        table.string('party');
+        table.string('photo_url');
+        table.integer('vote_count').defaultTo(0);
         table.timestamps(true, true);
-        table.foreign('voter_id').references('users.id').onDelete('CASCADE');
         table.foreign('election_id').references('elections.id').onDelete('CASCADE');
       });
-      console.log('✅ votes table created');
+      console.log('✅ candidates table created');
     } else {
-      console.log('✅ votes table already exists');
+      console.log('✅ candidates table already exists');
+    }
+
+    // Check if election_keys table exists
+    const hasElectionKeysTable = await db.schema.hasTable('election_keys');
+    if (!hasElectionKeysTable) {
+      console.log('📝 Creating election_keys table...');
+      await db.schema.createTable('election_keys', (table) => {
+        table.increments('id').primary();
+        table.integer('election_id').unsigned().notNullable().unique();
+        table.text('public_key').notNullable();
+        table.text('private_key');
+        table.timestamps(true, true);
+        table.foreign('election_id').references('elections.id').onDelete('CASCADE');
+      });
+      console.log('✅ election_keys table created');
+    } else {
+      console.log('✅ election_keys table already exists');
+    }
+
+    // Check if vote_receipts table exists
+    const hasVoteReceiptsTable = await db.schema.hasTable('vote_receipts');
+    if (!hasVoteReceiptsTable) {
+      console.log('📝 Creating vote_receipts table...');
+      await db.schema.createTable('vote_receipts', (table) => {
+        table.increments('id').primary();
+        table.integer('vote_id').unsigned().notNullable();
+        table.string('receipt_hash').unique();
+        table.string('qr_code');
+        table.string('blockchain_tx');
+        table.timestamps(true, true);
+        table.foreign('vote_id').references('votes.id').onDelete('CASCADE');
+      });
+      console.log('✅ vote_receipts table created');
+    } else {
+      console.log('✅ vote_receipts table already exists');
+    }
+
+    // Check if audit_logs table exists
+    const hasAuditLogsTable = await db.schema.hasTable('audit_logs');
+    if (!hasAuditLogsTable) {
+      console.log('📝 Creating audit_logs table...');
+      await db.schema.createTable('audit_logs', (table) => {
+        table.increments('id').primary();
+        table.integer('user_id').unsigned();
+        table.string('action').notNullable();
+        table.string('module');
+        table.text('details');
+        table.string('ip_address');
+        table.timestamps(true, true);
+        table.foreign('user_id').references('users.id').onDelete('SET NULL');
+      });
+      console.log('✅ audit_logs table created');
+    } else {
+      console.log('✅ audit_logs table already exists');
     }
 
     // Create super admin if not exists
