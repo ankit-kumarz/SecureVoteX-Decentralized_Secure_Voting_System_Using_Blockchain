@@ -70,34 +70,68 @@ const castEncryptedVote = async (req, res) => {
     const userId = req.user.id;
     const voterId = req.user.voter_id;
 
+    console.log('🗳️  Cast Encrypted Vote Request:', {
+      electionId,
+      candidateId,
+      userId,
+      voterId,
+      hasEncryptedVote: !!encryptedVote
+    });
+
     // Validate required fields
     if (!electionId || !candidateId || !encryptedVote) {
+      console.log('❌ Missing required fields:', { electionId, candidateId, encryptedVote: !!encryptedVote });
       return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    if (!userId || !voterId) {
+      console.log('❌ Missing user information:', { userId, voterId });
+      return res.status(400).json({ message: 'User information not found in token' });
     }
 
     // Check if election exists and is active
     const election = await electionModel.getElectionById(electionId);
     if (!election) {
+      console.log('❌ Election not found:', electionId);
       return res.status(404).json({ message: 'Election not found' });
     }
+
+    console.log('📋 Election found:', {
+      id: election.id,
+      title: election.title,
+      start_date: election.start_date,
+      end_date: election.end_date
+    });
 
     const now = new Date();
     const startDate = new Date(election.start_date);
     const endDate = new Date(election.end_date);
 
+    console.log('⏰ Date check:', {
+      now: now.toISOString(),
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      started: now >= startDate,
+      notEnded: now <= endDate
+    });
+
     if (now < startDate) {
+      console.log('❌ Election has not started yet');
       return res.status(400).json({ message: 'Election has not started yet' });
     }
 
     if (now > endDate) {
+      console.log('❌ Election has ended');
       return res.status(400).json({ message: 'Election has ended' });
     }
 
     // Check if user already voted
     const alreadyVoted = await voteModel.hasVoted(voterId, electionId);
     if (alreadyVoted) {
+      console.log('❌ User has already voted:', voterId);
       return res.status(409).json({ message: 'You have already voted in this election' });
     }
+    console.log('✅ User has not voted yet');
 
     // Generate unique salt for this vote
     const voteSalt = require('crypto').randomBytes(32).toString('hex');
@@ -107,6 +141,7 @@ const castEncryptedVote = async (req, res) => {
     const receiptHash = sha256Hash(receiptData);
 
     // Store vote in database
+    console.log('💾 Storing vote in database...');
     const [vote] = await voteModel.castVote({
       election_id: electionId,
       candidate_id: candidateId,
@@ -114,16 +149,21 @@ const castEncryptedVote = async (req, res) => {
       encrypted_vote: encryptedVote,
       vote_salt: voteSalt
     });
+    console.log('✅ Vote stored:', vote.id);
 
     // Create vote receipt
+    console.log('📜 Creating vote receipt...');
     const [receipt] = await voteReceiptModel.createVoteReceipt({
+      vote_id: vote.id,
       user_id: userId,
       election_id: electionId,
       receipt_hash: receiptHash,
-      tx_hash: null // Will be updated when blockchain tx is recorded
+      blockchain_tx: null // Will be updated when blockchain tx is recorded
     });
+    console.log('✅ Receipt created:', receipt.id);
 
     // Return receipt information
+    console.log('✅ Vote cast successfully');
     res.status(201).json({
       message: 'Vote cast successfully',
       receiptHash,
@@ -133,7 +173,12 @@ const castEncryptedVote = async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (err) {
-    console.error('Encrypted vote error:', err);
+    console.error('❌ Encrypted vote error:', err);
+    console.error('Error details:', {
+      message: err.message,
+      stack: err.stack,
+      code: err.code
+    });
     res.status(500).json({ message: 'Failed to cast vote', error: err.message });
   }
 };

@@ -226,7 +226,8 @@ async function initializeDatabase() {
         table.integer('voter_id').unsigned().notNullable();
         table.integer('election_id').unsigned().notNullable();
         table.integer('candidate_id').unsigned();
-        table.string('encrypted_vote');
+        table.text('encrypted_vote');
+        table.string('vote_salt');
         table.string('blockchain_tx');
         table.timestamps(true, true);
         table.foreign('voter_id').references('users.id').onDelete('CASCADE');
@@ -236,6 +237,27 @@ async function initializeDatabase() {
       console.log('✅ votes table created');
     } else {
       console.log('✅ votes table already exists');
+      
+      // Add vote_salt column if it doesn't exist
+      const hasVoteSalt = await db.schema.hasColumn('votes', 'vote_salt');
+      if (!hasVoteSalt) {
+        console.log('📝 Adding vote_salt column...');
+        await db.schema.table('votes', (table) => {
+          table.string('vote_salt');
+        });
+        console.log('✅ vote_salt column added');
+      }
+      
+      // Change encrypted_vote to text if it's currently string
+      const hasEncryptedVote = await db.schema.hasColumn('votes', 'encrypted_vote');
+      if (hasEncryptedVote) {
+        try {
+          await db.raw('ALTER TABLE votes ALTER COLUMN encrypted_vote TYPE text');
+          console.log('✅ encrypted_vote column type updated to text');
+        } catch (err) {
+          console.log('ℹ️ encrypted_vote column already in correct format');
+        }
+      }
     }
 
     // Check if vote_receipts table exists
@@ -244,16 +266,39 @@ async function initializeDatabase() {
       console.log('📝 Creating vote_receipts table...');
       await db.schema.createTable('vote_receipts', (table) => {
         table.increments('id').primary();
-        table.integer('vote_id').unsigned().notNullable();
+        table.integer('vote_id').unsigned();
+        table.integer('user_id').unsigned().notNullable();
+        table.integer('election_id').unsigned().notNullable();
         table.string('receipt_hash').unique();
         table.string('qr_code');
         table.string('blockchain_tx');
         table.timestamps(true, true);
-        table.foreign('vote_id').references('votes.id').onDelete('CASCADE');
+        table.foreign('vote_id').references('votes.id').onDelete('SET NULL');
+        table.foreign('user_id').references('users.id').onDelete('CASCADE');
+        table.foreign('election_id').references('elections.id').onDelete('CASCADE');
       });
       console.log('✅ vote_receipts table created');
     } else {
       console.log('✅ vote_receipts table already exists');
+      
+      // Add missing columns if they don't exist
+      const hasUserId = await db.schema.hasColumn('vote_receipts', 'user_id');
+      if (!hasUserId) {
+        console.log('📝 Adding user_id column...');
+        await db.schema.table('vote_receipts', (table) => {
+          table.integer('user_id').unsigned().notNullable();
+        });
+        console.log('✅ user_id column added');
+      }
+      
+      const hasElectionId = await db.schema.hasColumn('vote_receipts', 'election_id');
+      if (!hasElectionId) {
+        console.log('📝 Adding election_id column...');
+        await db.schema.table('vote_receipts', (table) => {
+          table.integer('election_id').unsigned().notNullable();
+        });
+        console.log('✅ election_id column added');
+      }
     }
 
     // Check if audit_logs table exists

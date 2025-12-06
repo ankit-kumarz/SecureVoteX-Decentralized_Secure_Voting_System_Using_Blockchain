@@ -121,7 +121,14 @@ const EncryptedVotePage = () => {
       setShowReceipt(true);
       setVoting(false);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to cast vote');
+      console.error('Vote submission error:', {
+        message: err.response?.data?.message,
+        error: err.response?.data?.error,
+        status: err.response?.status,
+        fullError: err.message
+      });
+      const errorMsg = err.response?.data?.message || err.response?.data?.error || 'Failed to cast vote';
+      setError(`${errorMsg}${err.response?.data?.error ? ` (${err.response?.data?.error})` : ''}`);
       setVoting(false);
     }
   };
