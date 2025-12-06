@@ -5,7 +5,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const dotenv = require('dotenv');
 const path = require('path');
-const initDb = require('./utils/initDb');
+const { initializeDatabase } = require('./utils/initDb');
 const authRoutes = require('./routes/auth');
 const electionRoutes = require('./routes/election');
 const candidateRoutes = require('./routes/candidate');
@@ -71,7 +71,7 @@ app.use(
 
 // Initialize database schema on startup
 console.log('📚 Initializing database...');
-initDb().then(() => {
+initializeDatabase().then(() => {
   console.log('✅ Database initialized');
 }).catch(err => {
   console.error('❌ Database initialization failed:', err.message);
