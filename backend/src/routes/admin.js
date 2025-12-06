@@ -10,51 +10,57 @@ const adminController = require('../controllers/adminController');
  */
 const getAdminStats = async (req, res) => {
   try {
-    // Total elections
-    const totalElections = await db('elections').count('* as count').first();
+    // Total elections - handle empty result
+    const electionResult = await db('elections').count('* as count').first();
+    const totalElections = electionResult?.count || 0;
     
     // Active elections today
     const now = new Date();
-    const activeElections = await db('elections')
+    const activeResult = await db('elections')
       .where('start_date', '<=', now)
       .where('end_date', '>=', now)
       .count('* as count')
       .first();
+    const activeCount = activeResult?.count || 0;
     
     // Total registered voters
-    const totalVoters = await db('users')
+    const voterResult = await db('users')
       .where('role', 'voter')
       .count('* as count')
       .first();
+    const totalVoters = voterResult?.count || 0;
     
     // Total votes cast
-    const totalVotes = await db('votes').count('* as count').first();
+    const votesResult = await db('votes').count('* as count').first();
+    const totalVotes = votesResult?.count || 0;
     
-    // Votes pending blockchain sync (where tx_hash is null)
-    const pendingSync = await db('votes')
-      .whereNull('tx_hash')
+    // Votes pending blockchain sync
+    const pendingResult = await db('votes')
+      .whereNull('blockchain_tx')
       .count('* as count')
       .first();
+    const pendingSync = pendingResult?.count || 0;
     
-    // Face-verified voters (check voter_profiles for registered biometrics)
-    const verifiedVoters = await db('voter_profiles')
-      .whereNotNull('embedding_encrypted')
+    // Face-verified voters
+    const verifiedResult = await db('voter_profiles')
+      .whereNotNull('biometric_data')
       .count('* as count')
       .first();
+    const verifiedVoters = verifiedResult?.count || 0;
     
-    // System alerts count (dummy for now)
+    // System alerts count
     const alertsCount = 0;
     
     res.json({
       success: true,
       stats: {
-        totalElections: parseInt(totalElections.count) || 0,
-        activeElections: parseInt(activeElections.count) || 0,
-        totalVoters: parseInt(totalVoters.count) || 0,
-        totalVotes: parseInt(totalVotes.count) || 0,
-        pendingBlockchainSync: parseInt(pendingSync.count) || 0,
-        faceVerifiedVoters: parseInt(verifiedVoters.count) || 0,
-        alertsCount
+        totalElections,
+        activeElections: activeCount,
+        totalRegisteredVoters: totalVoters,
+        totalVotesCast: totalVotes,
+        pendingBlockchainSync: pendingSync,
+        faceVerifiedVoters: verifiedVoters,
+        systemAlerts: alertsCount
       }
     });
   } catch (error) {
@@ -78,21 +84,23 @@ const getElectionMonitor = async (req, res) => {
       return res.status(404).json({ message: 'Election not found' });
     }
     
-    // Total votes for this election
-    const totalVotes = await db('votes')
+    // Total votes for this election - handle null result
+    const totalVotesResult = await db('votes')
       .where('election_id', electionId)
       .count('* as count')
       .first();
+    const totalVotes = totalVotesResult?.count || 0;
     
     // Get total eligible voters (all voters)
-    const totalEligibleVoters = await db('users')
+    const totalEligibleVotersResult = await db('users')
       .where('role', 'voter')
       .count('* as count')
       .first();
+    const totalEligibleVoters = totalEligibleVotersResult?.count || 0;
     
     // Turnout percentage
-    const turnout = totalEligibleVoters.count > 0 
-      ? ((totalVotes.count / totalEligibleVoters.count) * 100).toFixed(2)
+    const turnout = totalEligibleVoters > 0 
+      ? ((totalVotes / totalEligibleVoters) * 100).toFixed(2)
       : 0;
     
     // Vote distribution by candidate
@@ -109,9 +117,9 @@ const getElectionMonitor = async (req, res) => {
         'votes.created_at',
         'votes.voter_id',
         'candidates.name as candidate_name',
-        'votes.tx_hash'
+        'votes.blockchain_tx'
       )
-      .join('candidates', 'votes.candidate_id', 'candidates.id')
+      .leftJoin('candidates', 'votes.candidate_id', 'candidates.id')
       .where('votes.election_id', electionId)
       .orderBy('votes.created_at', 'desc')
       .limit(50);
@@ -131,12 +139,12 @@ const getElectionMonitor = async (req, res) => {
       success: true,
       election,
       monitoring: {
-        totalVotes: totalVotes.count || 0,
-        totalEligibleVoters: totalEligibleVoters.count || 0,
+        totalVotes: totalVotes,
+        totalEligibleVoters: totalEligibleVoters,
         turnoutPercentage: parseFloat(turnout),
         voteDistribution,
         recentActivity,
-        hourlyVotes: hourlyVotes[0] || []
+        hourlyVotes: hourlyVotes.rows || []
       }
     });
   } catch (error) {
@@ -151,14 +159,14 @@ const getElectionMonitor = async (req, res) => {
  */
 const getFraudAlerts = async (req, res) => {
   try {
-    // Failed face verifications (check voter_profiles for multiple attempts)
+    // Failed face verifications (check voter_profiles for null biometric data)
     const failedVerifications = await db.raw(`
       SELECT 
         user_id,
         COUNT(*) as attempt_count,
         MAX(created_at) as last_attempt
       FROM voter_profiles
-      WHERE face_descriptor IS NULL
+      WHERE biometric_data IS NULL
       GROUP BY user_id
       HAVING COUNT(*) > 2
       ORDER BY attempt_count DESC
@@ -190,8 +198,12 @@ const getFraudAlerts = async (req, res) => {
       HAVING COUNT(*) > 5
     `);
     
+    const failedVerificationsRows = failedVerifications.rows || [];
+    const duplicateVotesRows = duplicateVotes.rows || [];
+    const bulkVotingRows = bulkVoting.rows || [];
+    
     const alerts = {
-      failedVerifications: (failedVerifications[0] || []).map(record => ({
+      failedVerifications: failedVerificationsRows.map(record => ({
         type: 'failed_face_verification',
         severity: record.attempt_count > 5 ? 'high' : 'medium',
         userId: record.user_id,
@@ -199,7 +211,7 @@ const getFraudAlerts = async (req, res) => {
         lastAttempt: record.last_attempt,
         message: `User ${record.user_id} failed face verification ${record.attempt_count} times`
       })),
-      duplicateVotes: (duplicateVotes[0] || []).map(record => ({
+      duplicateVotes: duplicateVotesRows.map(record => ({
         type: 'duplicate_vote',
         severity: 'high',
         voterId: record.voter_id,
@@ -207,7 +219,7 @@ const getFraudAlerts = async (req, res) => {
         voteCount: record.vote_count,
         message: `Voter ${record.voter_id} has ${record.vote_count} votes in election ${record.election_id}`
       })),
-      bulkVoting: (bulkVoting[0] || []).map(record => ({
+      bulkVoting: bulkVotingRows.map(record => ({
         type: 'bulk_voting_pattern',
         severity: 'medium',
         voterId: record.voter_id,

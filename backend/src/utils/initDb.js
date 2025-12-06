@@ -176,12 +176,33 @@ async function initializeDatabase() {
         table.integer('election_id').unsigned().notNullable().unique();
         table.text('public_key').notNullable();
         table.text('private_key');
+        table.string('public_key_fingerprint');
+        table.timestamp('key_created_at').defaultTo(db.fn.now());
         table.timestamps(true, true);
         table.foreign('election_id').references('elections.id').onDelete('CASCADE');
       });
       console.log('✅ election_keys table created');
     } else {
       console.log('✅ election_keys table already exists');
+      
+      // Add missing columns if they don't exist
+      const hasFingerprint = await db.schema.hasColumn('election_keys', 'public_key_fingerprint');
+      if (!hasFingerprint) {
+        console.log('📝 Adding public_key_fingerprint column...');
+        await db.schema.table('election_keys', (table) => {
+          table.string('public_key_fingerprint');
+        });
+        console.log('✅ public_key_fingerprint column added');
+      }
+      
+      const hasKeyCreatedAt = await db.schema.hasColumn('election_keys', 'key_created_at');
+      if (!hasKeyCreatedAt) {
+        console.log('📝 Adding key_created_at column...');
+        await db.schema.table('election_keys', (table) => {
+          table.timestamp('key_created_at').defaultTo(db.fn.now());
+        });
+        console.log('✅ key_created_at column added');
+      }
     }
 
     // Check if votes table exists

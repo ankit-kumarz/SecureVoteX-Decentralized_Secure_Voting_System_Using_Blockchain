@@ -10,21 +10,27 @@ const createElection = async (req, res) => {
     // Create election
     const [election] = await electionModel.createElection({ title, description, start_date, end_date });
     
-    // Automatically generate encryption keys for the election
-    try {
-      const { publicKey, privateKey, fingerprint } = generateElectionKeyPair();
-      await electionKeyModel.createElectionKey({
-        election_id: election.id,
-        public_key: publicKey,
-        private_key: privateKey,
-        public_key_fingerprint: fingerprint
-      });
-    } catch (keyErr) {
-      console.error('Failed to generate encryption keys:', keyErr);
-      // Continue - election created but without keys
-    }
+    // Automatically generate encryption keys for the election (non-blocking)
+    setImmediate(async () => {
+      try {
+        const { publicKey, privateKey, fingerprint } = generateElectionKeyPair();
+        await electionKeyModel.createElectionKey({
+          election_id: election.id,
+          public_key: publicKey,
+          private_key: privateKey,
+          public_key_fingerprint: fingerprint,
+          key_created_at: new Date()
+        });
+        console.log('✅ Encryption keys generated for election', election.id);
+      } catch (keyErr) {
+        console.error('⚠️ Failed to generate encryption keys:', keyErr.message);
+      }
+    });
     
-    res.status(201).json(election);
+    res.status(201).json({
+      ...election,
+      message: 'Election created successfully'
+    });
   } catch (err) {
     res.status(500).json({ message: 'Failed to create election', error: err.message });
   }
