@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const dotenv = require('dotenv');
 const path = require('path');
+const initDb = require('./utils/initDb');
 const authRoutes = require('./routes/auth');
 const electionRoutes = require('./routes/election');
 const candidateRoutes = require('./routes/candidate');
@@ -67,6 +68,15 @@ app.use(
     cookie: { secure: false }
   })
 );
+
+// Initialize database schema on startup
+console.log('📚 Initializing database...');
+initDb().then(() => {
+  console.log('✅ Database initialized');
+}).catch(err => {
+  console.error('❌ Database initialization failed:', err.message);
+  process.exit(1);
+});
 
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));

@@ -5,10 +5,16 @@ const { generateElectionKeyPair } = require('../utils/keyManagement');
 const createElection = async (req, res) => {
   try {
     const { title, description, start_date, end_date } = req.body;
-    if (!title || !start_date || !end_date) return res.status(400).json({ message: 'Missing fields' });
+    console.log('📋 Creating election with:', { title, description, start_date, end_date });
+    
+    if (!title || !start_date || !end_date) {
+      console.warn('⚠️ Missing required fields');
+      return res.status(400).json({ message: 'Missing fields: title, start_date, and end_date are required' });
+    }
     
     // Create election
     const [election] = await electionModel.createElection({ title, description, start_date, end_date });
+    console.log('✅ Election created:', election);
     
     // Automatically generate encryption keys for the election (non-blocking)
     setImmediate(async () => {
@@ -32,7 +38,9 @@ const createElection = async (req, res) => {
       message: 'Election created successfully'
     });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to create election', error: err.message });
+    console.error('❌ Election creation error:', err.message);
+    console.error('Stack:', err.stack);
+    res.status(500).json({ message: 'Failed to create election', error: err.message, details: err.toString() });
   }
 };
 
