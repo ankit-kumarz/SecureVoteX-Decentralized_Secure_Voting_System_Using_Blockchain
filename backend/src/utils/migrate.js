@@ -1,6 +1,6 @@
 // Auto-run migrations on startup for production
 const knex = require('knex');
-const knexConfig = require('../knexfile');
+const knexConfig = require('../../knexfile');
 
 async function runMigrations() {
   console.log('🔄 Checking database migrations...');
