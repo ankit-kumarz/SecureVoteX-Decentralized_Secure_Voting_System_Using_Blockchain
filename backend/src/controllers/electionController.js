@@ -56,6 +56,45 @@ const deleteElection = async (req, res) => {
 };
 
 /**
+ * Debug endpoint - Shows all elections and which ones are active
+ * GET /api/election/debug-elections
+ */
+const debugElections = async (req, res) => {
+  try {
+    const now = new Date();
+    const elections = await electionModel.getAllElections();
+    
+    const electionsWithDebug = elections.map(e => {
+      const start = new Date(e.start_date);
+      const end = new Date(e.end_date);
+      const isActive = start <= now && now <= end;
+      
+      return {
+        ...e,
+        start_date: e.start_date,
+        end_date: e.end_date,
+        now: now.toISOString(),
+        start_date_ms: start.getTime(),
+        end_date_ms: end.getTime(),
+        now_ms: now.getTime(),
+        isActive,
+        reason: isActive ? 'ACTIVE' : (start > now ? 'NOT_STARTED' : 'ENDED')
+      };
+    });
+    
+    res.json({
+      success: true,
+      total: elections.length,
+      active: electionsWithDebug.filter(e => e.isActive).length,
+      elections: electionsWithDebug
+    });
+  } catch (err) {
+    console.error('Debug error:', err);
+    res.status(500).json({ message: 'Debug error', error: err.message });
+  }
+};
+
+/**
  * Get count of active and upcoming elections
  * GET /api/election/active-count
  */
@@ -113,4 +152,4 @@ const getActiveElections = async (req, res) => {
   }
 };
 
-module.exports = { createElection, getAllElections, deleteElection, getActiveElectionsCount, getActiveElections };
+module.exports = { createElection, getAllElections, deleteElection, getActiveElectionsCount, getActiveElections, debugElections };

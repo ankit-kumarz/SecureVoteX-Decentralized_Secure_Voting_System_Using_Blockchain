@@ -4,6 +4,7 @@ const electionController = require('../controllers/electionController');
 const { authenticate, authorize } = require('../middleware/auth');
 
 router.post('/', authenticate, authorize(['admin']), electionController.createElection);
+router.get('/debug-elections', electionController.debugElections);
 router.get('/active-count', authenticate, electionController.getActiveElectionsCount);
 router.get('/active-elections', authenticate, electionController.getActiveElections);
 router.get('/', authenticate, electionController.getAllElections);
