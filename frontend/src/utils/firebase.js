@@ -10,7 +10,15 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+// Only initialize Firebase if API key is provided
+let app = null;
+let auth = null;
+
+if (firebaseConfig.apiKey && firebaseConfig.apiKey !== 'your_firebase_api_key') {
+  app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+} else {
+  console.warn('Firebase not configured - OTP features will be disabled');
+}
 
 export { auth, RecaptchaVerifier, signInWithPhoneNumber };
