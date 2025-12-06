@@ -39,12 +39,12 @@ const getDetailedVotesByVoter = async (voter_id) => {
   const user = await db('users').where({ voter_id }).select('id').first();
   if (!user) return [];
   return db('votes')
+    .distinct('votes.id')  // Get distinct votes to avoid duplicates from leftJoin
     .where('votes.voter_id', user.id)
     .join('elections', 'votes.election_id', 'elections.id')
     .join('candidates', 'votes.candidate_id', 'candidates.id')
     .leftJoin('vote_receipts', function() {
-      this.on('vote_receipts.user_id', '=', user.id)
-          .andOn('vote_receipts.election_id', '=', 'votes.election_id');
+      this.on('vote_receipts.vote_id', '=', 'votes.id');
     })
     .select(
       // Vote details

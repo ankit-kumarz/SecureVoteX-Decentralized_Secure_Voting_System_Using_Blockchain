@@ -13,6 +13,16 @@ const VoteDetailsModal = ({ isOpen, onClose, vote }) => {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      
+      // Handle Escape key
+      const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+          onClose();
+        }
+      };
+      
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
     } else {
       document.body.style.overflow = 'auto';
     }
@@ -20,7 +30,7 @@ const VoteDetailsModal = ({ isOpen, onClose, vote }) => {
     return () => {
       document.body.style.overflow = 'auto';
     };
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   if (!isOpen || !vote) return null;
 
@@ -69,13 +79,22 @@ const VoteDetailsModal = ({ isOpen, onClose, vote }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-[95%] md:w-[80%] lg:w-[70%] max-w-4xl">
+    <div 
+      className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/70 backdrop-blur-sm overflow-y-auto" 
+      style={{ paddingTop: '2rem', paddingBottom: '2rem' }}
+      onClick={(e) => {
+        // Close only if clicking on the background, not the modal
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div className="relative w-[95%] md:w-[90%] lg:w-[80%] max-w-5xl my-auto">
         {/* Glowing background */}
         <div className="absolute -inset-1 bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink rounded-3xl opacity-40 blur-xl -z-10"></div>
         
         {/* Modal content */}
-        <div className="relative bg-gradient-to-br from-navy-900 via-navy-800 to-navy-700 rounded-2xl border border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="relative bg-gradient-to-br from-navy-900 via-navy-800 to-navy-700 rounded-2xl border border-white/10 shadow-2xl max-h-[85vh] overflow-y-auto">
           
           {/* Header */}
           <div className="sticky top-0 bg-navy-900/95 backdrop-blur-xl border-b border-white/10 p-6 flex items-center justify-between z-10">
@@ -96,8 +115,13 @@ const VoteDetailsModal = ({ isOpen, onClose, vote }) => {
             <button
               onClick={onClose}
               className="p-2 hover:bg-white/10 rounded-lg transition-colors group"
+              title="Close (Esc)"
             >
               <svg className="w-6 h-6 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/>
               </svg>
             </button>
