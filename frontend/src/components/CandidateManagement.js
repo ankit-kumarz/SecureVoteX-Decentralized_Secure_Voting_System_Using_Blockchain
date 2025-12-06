@@ -187,23 +187,25 @@ const CandidateManagement = () => {
         {candidates.map(c => (
           <div key={c.id} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-3 hover:bg-white/10 transition-all group">
             <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-3 flex-1">
                 {c.image && (
                   <img 
-                    src={`http://localhost:5000${c.image}`} 
+                    src={`${process.env.REACT_APP_API_URL}${c.image}`} 
                     alt={c.name} 
-                    className="w-12 h-12 object-cover rounded-full border-2 border-neon-purple/30"
-                    onError={(e) => { e.target.style.display = 'none'; }}
+                    className="w-12 h-12 object-cover rounded-full border-2 border-neon-purple/30 flex-shrink-0"
+                    onError={(e) => { 
+                      e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"%3E%3Cpath d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/%3E%3Ccircle cx="12" cy="7" r="4"/%3E%3C/svg%3E';
+                    }}
                   />
                 )}
-                <div>
-                  <h4 className="text-white font-medium">{c.name}</h4>
-                  <p className="text-gray-400 text-xs mt-1">{c.party}</p>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-white font-medium truncate">{c.name || 'Unknown'}</h4>
+                  <p className="text-gray-400 text-xs mt-1 truncate">{c.party || 'Independent'}</p>
                 </div>
               </div>
               <button 
                 onClick={() => handleDelete(c.id)} 
-                className="px-3 py-1 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg hover:bg-red-500/30 hover:scale-105 transition-all"
+                className="px-3 py-1 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg hover:bg-red-500/30 hover:scale-105 transition-all ml-2 flex-shrink-0"
               >
                 Delete
               </button>

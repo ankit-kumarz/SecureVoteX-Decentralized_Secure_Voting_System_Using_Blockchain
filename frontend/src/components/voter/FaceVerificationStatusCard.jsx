@@ -88,11 +88,7 @@ const FaceVerificationStatusCard = () => {
         
         {!isVerified && (
           <button
-            onClick={() => {
-              // Trigger face verification modal
-              // This can be handled by parent component state
-              window.location.reload(); // Temporary - replace with proper state management
-            }}
+            onClick={() => navigate('/biometric-registration')}
             className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-navy-900 font-semibold rounded-xl hover:scale-105 transition-all duration-300 shadow-lg whitespace-nowrap"
           >
             Complete Verification Now →

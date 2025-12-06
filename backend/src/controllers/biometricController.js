@@ -24,26 +24,22 @@ const registerBiometric = async (req, res) => {
     // Check if user already has biometric profile
     const existingProfile = await voterProfileModel.hasVoterProfile(userId);
     if (existingProfile) {
-      return res.status(409).json({ message: 'Biometric profile already exists' });
+      // Update existing profile instead of failing
+      await voterProfileModel.updateVoterProfile(userId, {
+        biometric_data: faceEmbeddingBase64,
+        is_verified: true
+      });
+      return res.status(200).json({
+        message: 'Biometric profile updated',
+        registered: true
+      });
     }
 
-    // Get HMAC secret from environment for face hash
-    const hmacSecret = process.env.HMAC_SECRET;
-
-    if (!hmacSecret) {
-      return res.status(500).json({ message: 'Server configuration error' });
-    }
-
-    // Create HMAC hash for integrity verification
-    const faceHash = createHmacHash(faceEmbeddingBase64, hmacSecret);
-
-    // Store embedding WITHOUT encryption for fast client-side comparison
-    // The embedding is already a mathematical representation, not raw image data
+    // Create new biometric profile
     const profile = {
       user_id: userId,
-      embedding_encrypted: faceEmbeddingBase64, // Store raw base64 descriptor (NOT encrypted)
-      embedding_salt: '', // Not used when not encrypting
-      face_hash: faceHash
+      biometric_data: faceEmbeddingBase64,
+      is_verified: true
     };
 
     await voterProfileModel.createVoterProfile(profile);
@@ -73,13 +69,14 @@ const verifyBiometric = async (req, res) => {
       return res.status(404).json({ message: 'No biometric profile found. Please register first.' });
     }
 
-    // Return the raw base64 descriptor (stored without encryption)
-    const storedEmbedding = profile.embedding_encrypted;
+    // Return the stored biometric data
+    const storedEmbedding = profile.biometric_data;
     
-    // Send RAW descriptor to client for instant comparison
+    // Send descriptor to client for comparison
     res.json({
       success: true,
       storedEmbedding: storedEmbedding,
+      isVerified: profile.is_verified,
       message: 'Biometric data retrieved successfully'
     });
   } catch (err) {
@@ -99,7 +96,8 @@ const getBiometricStatus = async (req, res) => {
 
     res.json({
       registered: !!profile,
-      registeredAt: profile ? profile.biometric_registered_at : null
+      verified: profile ? profile.is_verified : false,
+      verifiedAt: profile ? profile.updated_at : null
     });
   } catch (err) {
     console.error('Get biometric status error:', err);
