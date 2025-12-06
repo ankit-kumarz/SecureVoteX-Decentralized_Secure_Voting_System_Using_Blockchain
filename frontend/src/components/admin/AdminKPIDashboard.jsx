@@ -26,13 +26,23 @@ const AdminKPIDashboard = () => {
   const fetchStats = async () => {
     try {
       const res = await API.get('/admin/stats');
-      if (res.data.success) {
-        setStats(res.data.stats);
+      if (res.data.success && res.data.stats) {
+        // Ensure all stats have default values
+        setStats({
+          totalElections: res.data.stats.totalElections || 0,
+          activeElections: res.data.stats.activeElections || 0,
+          totalRegisteredVoters: res.data.stats.totalRegisteredVoters || 0,
+          totalVotesCast: res.data.stats.totalVotesCast || 0,
+          pendingBlockchainSync: res.data.stats.pendingBlockchainSync || 0,
+          faceVerifiedVoters: res.data.stats.faceVerifiedVoters || 0,
+          systemAlerts: res.data.stats.systemAlerts || 0
+        });
       }
       setLoading(false);
     } catch (error) {
-      console.error('Failed to fetch admin stats:', error);
+      console.error('Failed to fetch admin stats:', error.response?.data || error.message);
       setLoading(false);
+      // Keep default stats on error
     }
   };
 
@@ -56,7 +66,7 @@ const AdminKPIDashboard = () => {
         <div className="space-y-2">
           <p className="text-gray-400 text-sm font-medium">{title}</p>
           <p className="text-4xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-            {loading ? '...' : value.toLocaleString()}
+            {loading ? '...' : (value !== undefined && value !== null ? String(value).replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0')}
           </p>
         </div>
       </div>

@@ -67,9 +67,29 @@ const login = async (req, res) => {
     if (!user) return res.status(401).json({ message: 'Invalid credentials' });
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(401).json({ message: 'Invalid credentials' });
-    const token = jwt.sign({ id: user.id, role: user.role, voter_id: user.voter_id }, process.env.JWT_SECRET, { expiresIn: '2h' });
-    req.session.user = { id: user.id, role: user.role, voter_id: user.voter_id };
-    res.json({ token, role: user.role, voter_id: user.voter_id });
+    
+    // Create token with admin info
+    const token = jwt.sign({ 
+      id: user.id, 
+      role: user.role, 
+      voter_id: user.voter_id,
+      admin_type: user.admin_type 
+    }, process.env.JWT_SECRET, { expiresIn: '2h' });
+    
+    req.session.user = { 
+      id: user.id, 
+      role: user.role, 
+      voter_id: user.voter_id,
+      admin_type: user.admin_type
+    };
+    
+    res.json({ 
+      token, 
+      role: user.role, 
+      voter_id: user.voter_id,
+      admin_type: user.admin_type,
+      email: user.email
+    });
   } catch (err) {
     res.status(500).json({ message: 'Login failed', error: err.message });
   }
