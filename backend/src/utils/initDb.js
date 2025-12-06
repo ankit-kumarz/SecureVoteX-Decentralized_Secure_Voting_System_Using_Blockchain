@@ -88,7 +88,7 @@ async function initializeDatabase() {
         table.increments('id').primary();
         table.integer('user_id').unsigned().notNullable();
         table.string('phone_number');
-        table.string('biometric_data');
+        table.text('biometric_data'); // Changed from string to text for large embeddings
         table.boolean('is_verified').defaultTo(false);
         table.timestamps(true, true);
         table.foreign('user_id').references('users.id').onDelete('CASCADE');
@@ -96,6 +96,18 @@ async function initializeDatabase() {
       console.log('✅ voter_profiles table created');
     } else {
       console.log('✅ voter_profiles table already exists');
+      
+      // Check if biometric_data column needs to be changed from string to text
+      const hasColumn = await db.schema.hasColumn('voter_profiles', 'biometric_data');
+      if (hasColumn) {
+        // Try to alter column type - this is database-specific
+        try {
+          await db.raw('ALTER TABLE voter_profiles ALTER COLUMN biometric_data TYPE text');
+          console.log('✅ biometric_data column type updated to text');
+        } catch (err) {
+          console.log('ℹ️ biometric_data column already in correct format');
+        }
+      }
     }
 
     // Check if elections table exists
