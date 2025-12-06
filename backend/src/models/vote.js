@@ -10,7 +10,13 @@ const castVoteWithTx = async (vote, tx_hash) => {
 };
 
 const hasVoted = async (voter_id, election_id) => {
-  return db('votes').where({ voter_id, election_id }).first();
+  // voter_id is a string like "VOTER-xxx", but we need to check using user record
+  // Get the user ID from the voter_id first
+  const user = await db('users').where({ voter_id }).select('id').first();
+  if (!user) {
+    return false; // User not found, so hasn't voted
+  }
+  return db('votes').where({ voter_id: user.id, election_id }).first();
 };
 
 const getVotesByElection = async (election_id) => {
@@ -18,7 +24,10 @@ const getVotesByElection = async (election_id) => {
 };
 
 const getVotesByVoter = async (voter_id) => {
-  return db('votes').where({ voter_id }).orderBy('created_at', 'desc');
+  // voter_id is a string like "VOTER-xxx", get the user ID first
+  const user = await db('users').where({ voter_id }).select('id').first();
+  if (!user) return [];
+  return db('votes').where({ voter_id: user.id }).orderBy('created_at', 'desc');
 };
 
 /**
@@ -26,12 +35,15 @@ const getVotesByVoter = async (voter_id) => {
  * Returns enriched data for beautiful UI display
  */
 const getDetailedVotesByVoter = async (voter_id) => {
+  // voter_id is a string like "VOTER-xxx", get the user ID first
+  const user = await db('users').where({ voter_id }).select('id').first();
+  if (!user) return [];
   return db('votes')
-    .where('votes.voter_id', voter_id)
+    .where('votes.voter_id', user.id)
     .join('elections', 'votes.election_id', 'elections.id')
     .join('candidates', 'votes.candidate_id', 'candidates.id')
     .leftJoin('vote_receipts', function() {
-      this.on('vote_receipts.user_id', '=', db.raw('(SELECT id FROM users WHERE voter_id = ?)', [voter_id]))
+      this.on('vote_receipts.user_id', '=', user.id)
           .andOn('vote_receipts.election_id', '=', 'votes.election_id');
     })
     .select(
