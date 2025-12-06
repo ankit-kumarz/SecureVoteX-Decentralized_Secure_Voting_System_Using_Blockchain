@@ -71,18 +71,23 @@ const MyVotesAndResults = ({ showReceiptModal, setShowReceiptModal }) => {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink bg-clip-text text-transparent">
-            My Votes & Results
-          </h2>
-          <p className="text-gray-400 text-sm mt-1">
-            {votes.length === 0 ? 'No votes yet' : `${votes.length} vote${votes.length !== 1 ? 's' : ''} recorded`}
-          </p>
-        </div>
+      {/* Remove duplicates based on vote_id */}
+      {(() => {
+        const uniqueVotes = Array.from(new Map(votes.map(vote => [vote.vote_id, vote])).values());
+        return (
+          <>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink bg-clip-text text-transparent">
+                  My Votes & Results
+                </h2>
+                <p className="text-gray-400 text-sm mt-1">
+                  {uniqueVotes.length === 0 ? 'No votes yet' : `${uniqueVotes.length} vote${uniqueVotes.length !== 1 ? 's' : ''} recorded`}
+                </p>
+              </div>
         
-        {votes.length > 0 && (
+        {uniqueVotes.length > 0 && (
           <button
             onClick={fetchVotes}
             className="p-2 hover:bg-white/10 rounded-lg transition-colors"
@@ -93,37 +98,40 @@ const MyVotesAndResults = ({ showReceiptModal, setShowReceiptModal }) => {
             </svg>
           </button>
         )}
-      </div>
+            </div>
 
-      {/* Vote Cards */}
-      {votes.length === 0 ? (
-        <div className="text-center py-12">
-          <div className="w-20 h-20 bg-gradient-to-br from-neon-blue/20 to-neon-purple/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
-          </div>
-          <p className="text-gray-400 text-lg">You haven't cast any votes yet</p>
-          <p className="text-gray-500 text-sm mt-2">Your voting history will appear here</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {votes.map((vote) => (
-            <VoteCard
-              key={vote.vote_id}
-              vote={vote}
-              onViewDetails={() => handleViewDetails(vote)}
+            {/* Vote Cards */}
+            {uniqueVotes.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-20 h-20 bg-gradient-to-br from-neon-blue/20 to-neon-purple/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                </div>
+                <p className="text-gray-400 text-lg">You haven't cast any votes yet</p>
+                <p className="text-gray-500 text-sm mt-2">Your voting history will appear here</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {uniqueVotes.map((vote) => (
+                  <VoteCard
+                    key={vote.vote_id}
+                    vote={vote}
+                    onViewDetails={() => handleViewDetails(vote)}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Vote Details Modal */}
+            <VoteDetailsModal
+              isOpen={showReceiptModal}
+              onClose={handleCloseModal}
+              vote={selectedVote}
             />
-          ))}
-        </div>
-      )}
-
-      {/* Vote Details Modal */}
-      <VoteDetailsModal
-        isOpen={showReceiptModal}
-        onClose={handleCloseModal}
-        vote={selectedVote}
-      />
+          </>
+        );
+      })()}
     </div>
   );
 };

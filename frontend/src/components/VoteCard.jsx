@@ -68,9 +68,13 @@ const VoteCard = ({ vote, onViewDetails }) => {
             <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/20 shadow-lg">
               {vote.candidate.image ? (
                 <img 
-                  src={`http://localhost:5000${vote.candidate.image}`} 
+                  src={`${process.env.REACT_APP_API_URL}${vote.candidate.image}`} 
                   alt={vote.candidate.name}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextElementSibling?.style.display = 'flex';
+                  }}
                 />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-neon-pink to-neon-aqua flex items-center justify-center">
