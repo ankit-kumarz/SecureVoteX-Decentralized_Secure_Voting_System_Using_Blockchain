@@ -22,6 +22,10 @@ async function initializeDatabase() {
         table.enum('admin_type', ['SUPER_ADMIN', 'ELECTION_ADMIN', 'SYSTEM_AUDITOR', 'SUPPORT_STAFF']).nullable();
         table.string('voter_id').unique();
         table.string('wallet_address');
+        table.boolean('is_temp_password').defaultTo(false);
+        table.integer('created_by_admin_id').unsigned().nullable();
+        table.boolean('account_disabled').defaultTo(false);
+        table.timestamp('password_changed_at').nullable();
         table.timestamps(true, true);
       });
       console.log('✅ users table created');
@@ -36,6 +40,43 @@ async function initializeDatabase() {
           table.enum('admin_type', ['SUPER_ADMIN', 'ELECTION_ADMIN', 'SYSTEM_AUDITOR', 'SUPPORT_STAFF']).nullable();
         });
         console.log('✅ admin_type column added');
+      }
+      
+      // Add missing admin-related columns
+      const hasTempPassword = await db.schema.hasColumn('users', 'is_temp_password');
+      if (!hasTempPassword) {
+        console.log('📝 Adding is_temp_password column...');
+        await db.schema.table('users', (table) => {
+          table.boolean('is_temp_password').defaultTo(false);
+        });
+        console.log('✅ is_temp_password column added');
+      }
+      
+      const hasCreatedByAdminId = await db.schema.hasColumn('users', 'created_by_admin_id');
+      if (!hasCreatedByAdminId) {
+        console.log('📝 Adding created_by_admin_id column...');
+        await db.schema.table('users', (table) => {
+          table.integer('created_by_admin_id').unsigned().nullable();
+        });
+        console.log('✅ created_by_admin_id column added');
+      }
+      
+      const hasAccountDisabled = await db.schema.hasColumn('users', 'account_disabled');
+      if (!hasAccountDisabled) {
+        console.log('📝 Adding account_disabled column...');
+        await db.schema.table('users', (table) => {
+          table.boolean('account_disabled').defaultTo(false);
+        });
+        console.log('✅ account_disabled column added');
+      }
+      
+      const hasPasswordChangedAt = await db.schema.hasColumn('users', 'password_changed_at');
+      if (!hasPasswordChangedAt) {
+        console.log('📝 Adding password_changed_at column...');
+        await db.schema.table('users', (table) => {
+          table.timestamp('password_changed_at').nullable();
+        });
+        console.log('✅ password_changed_at column added');
       }
     }
 
@@ -66,13 +107,25 @@ async function initializeDatabase() {
         table.string('title').notNullable();
         table.text('description');
         table.enum('status', ['draft', 'active', 'completed']).defaultTo('draft');
-        table.timestamp('start_time');
-        table.timestamp('end_time');
+        table.timestamp('start_date');
+        table.timestamp('end_date');
         table.timestamps(true, true);
       });
       console.log('✅ elections table created');
     } else {
       console.log('✅ elections table already exists');
+      
+      // Check if columns use old names and update if needed
+      const hasStartTime = await db.schema.hasColumn('elections', 'start_time');
+      const hasStartDate = await db.schema.hasColumn('elections', 'start_date');
+      if (hasStartTime && !hasStartDate) {
+        console.log('📝 Migrating elections table columns...');
+        await db.schema.table('elections', (table) => {
+          table.timestamp('start_date');
+          table.timestamp('end_date');
+        });
+        console.log('✅ elections table columns migrated');
+      }
     }
 
     // Check if candidates table exists
@@ -83,9 +136,9 @@ async function initializeDatabase() {
         table.increments('id').primary();
         table.integer('election_id').unsigned().notNullable();
         table.string('name').notNullable();
-        table.text('description');
+        table.text('manifesto');
         table.string('party');
-        table.string('photo_url');
+        table.string('image');
         table.integer('vote_count').defaultTo(0);
         table.timestamps(true, true);
         table.foreign('election_id').references('elections.id').onDelete('CASCADE');
@@ -93,6 +146,25 @@ async function initializeDatabase() {
       console.log('✅ candidates table created');
     } else {
       console.log('✅ candidates table already exists');
+      
+      // Add missing columns to candidates table
+      const hasManifesto = await db.schema.hasColumn('candidates', 'manifesto');
+      if (!hasManifesto) {
+        console.log('📝 Adding manifesto column...');
+        await db.schema.table('candidates', (table) => {
+          table.text('manifesto');
+        });
+        console.log('✅ manifesto column added');
+      }
+      
+      const hasImage = await db.schema.hasColumn('candidates', 'image');
+      if (!hasImage) {
+        console.log('📝 Adding image column...');
+        await db.schema.table('candidates', (table) => {
+          table.string('image');
+        });
+        console.log('✅ image column added');
+      }
     }
 
     // Check if election_keys table exists
@@ -110,6 +182,27 @@ async function initializeDatabase() {
       console.log('✅ election_keys table created');
     } else {
       console.log('✅ election_keys table already exists');
+    }
+
+    // Check if votes table exists
+    const hasVotesTable = await db.schema.hasTable('votes');
+    if (!hasVotesTable) {
+      console.log('📝 Creating votes table...');
+      await db.schema.createTable('votes', (table) => {
+        table.increments('id').primary();
+        table.integer('voter_id').unsigned().notNullable();
+        table.integer('election_id').unsigned().notNullable();
+        table.integer('candidate_id').unsigned();
+        table.string('encrypted_vote');
+        table.string('blockchain_tx');
+        table.timestamps(true, true);
+        table.foreign('voter_id').references('users.id').onDelete('CASCADE');
+        table.foreign('election_id').references('elections.id').onDelete('CASCADE');
+        table.foreign('candidate_id').references('candidates.id').onDelete('SET NULL');
+      });
+      console.log('✅ votes table created');
+    } else {
+      console.log('✅ votes table already exists');
     }
 
     // Check if vote_receipts table exists
