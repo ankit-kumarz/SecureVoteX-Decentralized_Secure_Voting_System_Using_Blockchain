@@ -4,18 +4,30 @@ const userModel = require('../models/user');
 
 const register = async (req, res) => {
   try {
+    console.log('📝 Registration attempt:', req.body.email);
     const { email, password, role, wallet_address } = req.body;
     
     // Block admin registration via public endpoint
     if (role === 'admin') {
+      console.log('❌ Admin registration blocked');
       return res.status(403).json({ 
         message: 'Admin registration is not allowed. Contact your system administrator for an invite.' 
       });
     }
     
-    if (!email || !password) return res.status(400).json({ message: 'Missing fields' });
+    if (!email || !password) {
+      console.log('❌ Missing fields');
+      return res.status(400).json({ message: 'Missing fields' });
+    }
+    
+    console.log('🔍 Checking existing user...');
     const existing = await userModel.getUserByEmail(email);
-    if (existing) return res.status(409).json({ message: 'Email already registered' });
+    if (existing) {
+      console.log('❌ Email already registered');
+      return res.status(409).json({ message: 'Email already registered' });
+    }
+    
+    console.log('🔐 Hashing password...');
     const hash = await bcrypt.hash(password, 10);
     const voter_id = 'VOTER-' + Date.now() + Math.floor(Math.random() * 1000);
     const user = {
@@ -25,11 +37,15 @@ const register = async (req, res) => {
       voter_id,
       wallet_address: wallet_address || null
     };
+    
+    console.log('💾 Creating user in database...');
     const [created] = await userModel.createUser(user);
+    console.log('✅ User created:', created.id);
     
     // Generate token for immediate biometric registration
     const token = jwt.sign({ id: created.id, role: created.role, voter_id: created.voter_id }, process.env.JWT_SECRET, { expiresIn: '1h' });
     
+    console.log('✅ Registration successful');
     res.status(201).json({ 
       id: created.id, 
       role: created.role, 
@@ -38,6 +54,8 @@ const register = async (req, res) => {
       token 
     });
   } catch (err) {
+    console.error('❌ Registration error:', err.message);
+    console.error('Stack:', err.stack);
     res.status(500).json({ message: 'Registration failed', error: err.message });
   }
 };
