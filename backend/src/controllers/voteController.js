@@ -127,7 +127,7 @@ const getAllVotes = async (req, res) => {
     const db = require('../models/db');
     
     const votes = await db('votes')
-      .leftJoin('users', 'votes.voter_id', 'users.voter_id')
+      .leftJoin('users', 'votes.voter_id', 'users.id')  // Fixed: use id, not voter_id
       .leftJoin('elections', 'votes.election_id', 'elections.id')
       .leftJoin('candidates', 'votes.candidate_id', 'candidates.id')
       .select(
@@ -135,9 +135,12 @@ const getAllVotes = async (req, res) => {
         'votes.voter_id',
         'votes.election_id',
         'votes.candidate_id',
-        'votes.tx_hash as transaction_hash',
+        'votes.encrypted_vote',
+        'votes.vote_salt',
+        'votes.blockchain_tx as transaction_hash',
         'votes.created_at as timestamp',
         'users.email as voter_email',
+        'users.voter_id as voter_id_string',
         'elections.title as election_title',
         'candidates.name as candidate_name'
       )
