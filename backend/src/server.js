@@ -19,6 +19,9 @@ dotenv.config();
 
 const app = express();
 
+// Trust proxy for Render deployment
+app.set('trust proxy', 1);
+
 // CORS configuration - must be before helmet
 app.use(cors({ 
   origin: [
@@ -40,7 +43,9 @@ app.use(helmet({
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 app.use('/api/', limiter);
 
@@ -48,6 +53,8 @@ app.use('/api/', limiter);
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100, // Increased for development (reduce to 10 in production)
+  standardHeaders: true,
+  legacyHeaders: false,
   message: 'Too many authentication attempts, please try again later.'
 });
 
