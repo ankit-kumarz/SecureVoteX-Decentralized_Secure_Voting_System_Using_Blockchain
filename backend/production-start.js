@@ -1,14 +1,14 @@
 console.log('🚀 Starting Production Server...\n');
 
-// Run database migrations automatically
-const { runMigrations } = require('./src/utils/migrate');
+// Initialize database tables
+const { initializeDatabase } = require('./src/utils/initDb');
 
 (async () => {
-  // Run migrations first
-  const migrated = await runMigrations();
+  // Initialize database first
+  const dbReady = await initializeDatabase();
   
-  if (!migrated) {
-    console.warn('⚠️  Migrations failed, but continuing anyway...');
+  if (!dbReady) {
+    console.warn('⚠️  Database initialization failed, but continuing anyway...');
   }
 
   // In production, we skip the local blockchain
