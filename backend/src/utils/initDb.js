@@ -1,6 +1,7 @@
 // Direct database initialization - bypasses problematic migrations
 const knex = require('knex');
 const knexConfig = require('../../knexfile');
+const bcrypt = require('bcrypt');
 
 async function initializeDatabase() {
   console.log('🔄 Initializing database tables...');
@@ -81,6 +82,29 @@ async function initializeDatabase() {
       console.log('✅ votes table created');
     } else {
       console.log('✅ votes table already exists');
+    }
+
+    // Create super admin if not exists
+    console.log('🔍 Checking for super admin...');
+    const superAdmin = await db('users').where({ email: 'superadmin@votex.com' }).first();
+    
+    if (!superAdmin) {
+      console.log('👑 Creating super admin...');
+      const hashedPassword = await bcrypt.hash('Admin@108', 10);
+      await db('users').insert({
+        email: 'superadmin@votex.com',
+        password: hashedPassword,
+        role: 'admin',
+        voter_id: 'ADMIN-SUPER-001',
+        wallet_address: null,
+        created_at: new Date(),
+        updated_at: new Date()
+      });
+      console.log('✅ Super admin created!');
+      console.log('   Email: superadmin@votex.com');
+      console.log('   Password: Admin@108');
+    } else {
+      console.log('✅ Super admin already exists');
     }
 
     console.log('✅ Database initialization complete');
