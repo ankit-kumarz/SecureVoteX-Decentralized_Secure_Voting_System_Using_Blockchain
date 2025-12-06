@@ -4,6 +4,7 @@ import Homepage from './pages/Homepage';
 import LoginSelection from './pages/LoginSelection';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import BiometricRegistration from './pages/BiometricRegistration';
 import AdminDashboard from './pages/AdminDashboard';
 import VoterDashboard from './pages/VoterDashboard';
 import ElectionPage from './pages/ElectionPage';
@@ -30,6 +31,7 @@ function App() {
           <Route path="/voter-login" element={<Login />} />
           <Route path="/admin-login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/biometric-registration" element={<BiometricRegistration />} />
           <Route path="/otp" element={<OTPPage />} />
           <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/about-system" element={<AboutSystemPage />} />
