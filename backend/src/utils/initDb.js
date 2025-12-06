@@ -19,6 +19,7 @@ async function initializeDatabase() {
         table.string('email').unique().notNullable();
         table.string('password').notNullable();
         table.enum('role', ['voter', 'admin', 'election_admin', 'system_auditor', 'support_staff']).defaultTo('voter');
+        table.enum('admin_type', ['SUPER_ADMIN', 'ELECTION_ADMIN', 'SYSTEM_AUDITOR', 'SUPPORT_STAFF']).nullable();
         table.string('voter_id').unique();
         table.string('wallet_address');
         table.timestamps(true, true);
@@ -26,6 +27,16 @@ async function initializeDatabase() {
       console.log('✅ users table created');
     } else {
       console.log('✅ users table already exists');
+      
+      // Check if admin_type column exists, if not add it
+      const hasAdminType = await db.schema.hasColumn('users', 'admin_type');
+      if (!hasAdminType) {
+        console.log('📝 Adding admin_type column...');
+        await db.schema.table('users', (table) => {
+          table.enum('admin_type', ['SUPER_ADMIN', 'ELECTION_ADMIN', 'SYSTEM_AUDITOR', 'SUPPORT_STAFF']).nullable();
+        });
+        console.log('✅ admin_type column added');
+      }
     }
 
     // Check if voter_profiles table exists
@@ -95,6 +106,7 @@ async function initializeDatabase() {
         email: 'superadmin@votex.com',
         password: hashedPassword,
         role: 'admin',
+        admin_type: 'SUPER_ADMIN',
         voter_id: 'ADMIN-SUPER-001',
         wallet_address: null,
         created_at: new Date(),
@@ -103,6 +115,11 @@ async function initializeDatabase() {
       console.log('✅ Super admin created!');
       console.log('   Email: superadmin@votex.com');
       console.log('   Password: Admin@108');
+    } else if (!superAdmin.admin_type) {
+      // Update existing admin to have SUPER_ADMIN type
+      console.log('📝 Updating existing admin with SUPER_ADMIN type...');
+      await db('users').where({ email: 'superadmin@votex.com' }).update({ admin_type: 'SUPER_ADMIN' });
+      console.log('✅ Super admin updated!');
     } else {
       console.log('✅ Super admin already exists');
     }
