@@ -190,7 +190,7 @@ const CandidateManagement = () => {
               <div className="flex items-center space-x-3 flex-1">
                 {c.image && (
                   <img 
-                    src={`${process.env.REACT_APP_API_URL}${c.image}`} 
+                    src={c.image.startsWith('http') ? c.image : `${process.env.REACT_APP_API_URL}${c.image}`}
                     alt={c.name} 
                     className="w-12 h-12 object-cover rounded-full border-2 border-neon-purple/30 flex-shrink-0"
                     onError={(e) => { 

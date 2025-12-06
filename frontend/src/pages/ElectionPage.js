@@ -74,7 +74,7 @@ const ElectionPage = () => {
           <div key={c.id} className="bg-white p-4 rounded shadow flex flex-col items-center">
             {c.image && (
               <img 
-                src={`http://localhost:5000${c.image}`} 
+                src={c.image.startsWith('http') ? c.image : `${process.env.REACT_APP_API_URL}${c.image}`}
                 alt={c.name} 
                 className="w-24 h-24 object-cover rounded-full mb-2"
                 onError={(e) => { e.target.style.display = 'none'; }}

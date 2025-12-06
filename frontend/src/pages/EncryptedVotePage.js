@@ -209,7 +209,7 @@ const EncryptedVotePage = () => {
                 <div className="flex items-center">
                   {candidate.image && (
                     <img 
-                      src={`http://localhost:5000${candidate.image}`} 
+                      src={candidate.image.startsWith('http') ? candidate.image : `${process.env.REACT_APP_API_URL}${candidate.image}`}
                       alt={candidate.name} 
                       className="w-20 h-20 object-cover rounded-xl mr-4 border-2 border-neon-purple/30 shadow-lg"
                       onError={(e) => { e.target.style.display = 'none'; }}

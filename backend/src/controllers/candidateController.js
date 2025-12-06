@@ -8,18 +8,18 @@ const addCandidate = async (req, res) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
     
-    // Get image path from uploaded file
-    let imagePath = null;
+    // Get image URL from Cloudinary response
+    // req.file.path contains the Cloudinary URL when using CloudinaryStorage
+    let imageUrl = null;
     if (req.file) {
-      // Store relative path that frontend can use
-      imagePath = `/uploads/candidates/${req.file.filename}`;
+      imageUrl = req.file.path; // Cloudinary provides full URL in 'path' property
     }
     
     const [candidate] = await candidateModel.createCandidate({ 
       name, 
       party, 
       manifesto, 
-      image: imagePath, 
+      image: imageUrl, // Store the full Cloudinary URL
       election_id 
     });
     

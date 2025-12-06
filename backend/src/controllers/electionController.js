@@ -87,4 +87,30 @@ const getActiveElectionsCount = async (req, res) => {
   }
 };
 
-module.exports = { createElection, getAllElections, deleteElection, getActiveElectionsCount };
+/**
+ * Get all active elections with full details
+ * GET /api/election/active-elections
+ */
+const getActiveElections = async (req, res) => {
+  try {
+    const now = new Date();
+    const elections = await electionModel.getAllElections();
+    
+    const activeElections = elections.filter(e => {
+      const start = new Date(e.start_date);
+      const end = new Date(e.end_date);
+      return start <= now && now <= end;
+    });
+    
+    res.json({
+      success: true,
+      elections: activeElections,
+      count: activeElections.length
+    });
+  } catch (err) {
+    console.error('Failed to fetch active elections:', err);
+    res.status(500).json({ message: 'Failed to fetch active elections', error: err.message });
+  }
+};
+
+module.exports = { createElection, getAllElections, deleteElection, getActiveElectionsCount, getActiveElections };
