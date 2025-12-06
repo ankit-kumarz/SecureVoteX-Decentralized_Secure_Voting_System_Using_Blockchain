@@ -9,11 +9,11 @@ const AdminKPIDashboard = () => {
   const [stats, setStats] = useState({
     totalElections: 0,
     activeElections: 0,
-    totalVoters: 0,
-    totalVotes: 0,
+    totalRegisteredVoters: 0,
+    totalVotesCast: 0,
     pendingBlockchainSync: 0,
     faceVerifiedVoters: 0,
-    alertsCount: 0
+    systemAlerts: 0
   });
   const [loading, setLoading] = useState(true);
 
@@ -117,7 +117,7 @@ const AdminKPIDashboard = () => {
 
         <KPICard
           title="Registered Voters"
-          value={stats.totalVoters}
+          value={stats.totalRegisteredVoters}
           gradient="from-neon-blue to-neon-aqua"
           shadowColor="neon-blue"
           icon={
@@ -129,7 +129,7 @@ const AdminKPIDashboard = () => {
 
         <KPICard
           title="Total Votes Cast"
-          value={stats.totalVotes}
+          value={stats.totalVotesCast}
           gradient="from-neon-pink to-neon-purple"
           shadowColor="neon-pink"
           icon={
@@ -166,9 +166,9 @@ const AdminKPIDashboard = () => {
 
         <KPICard
           title="System Alerts"
-          value={stats.alertsCount}
-          gradient={stats.alertsCount > 0 ? "from-red-500 to-pink-500" : "from-gray-600 to-gray-500"}
-          shadowColor={stats.alertsCount > 0 ? "red-500" : "gray-500"}
+          value={stats.systemAlerts}
+          gradient={stats.systemAlerts > 0 ? "from-red-500 to-pink-500" : "from-gray-600 to-gray-500"}
+          shadowColor={stats.systemAlerts > 0 ? "red-500" : "gray-500"}
           icon={
             <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
@@ -178,8 +178,8 @@ const AdminKPIDashboard = () => {
 
         <KPICard
           title="Voter Turnout"
-          value={stats.totalVotes > 0 && stats.totalVoters > 0 
-            ? `${((stats.totalVotes / stats.totalVoters) * 100).toFixed(1)}%` 
+          value={stats.totalVotesCast > 0 && stats.totalRegisteredVoters > 0 
+            ? `${((stats.totalVotesCast / stats.totalRegisteredVoters) * 100).toFixed(1)}%` 
             : '0%'}
           gradient="from-indigo-500 to-purple-500"
           shadowColor="indigo-500"
