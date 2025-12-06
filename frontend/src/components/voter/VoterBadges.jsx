@@ -22,20 +22,35 @@ const VoterBadges = () => {
       setLoading(true);
       
       // Fetch vote count
-      const voteRes = await API.get('/vote/my-count');
-      setVoteCount(voteRes.data.totalVotes || 0);
+      try {
+        const voteRes = await API.get('/vote/my-count');
+        setVoteCount(voteRes.data.totalVotes || 0);
+      } catch (err) {
+        console.error('Failed to fetch vote count:', err);
+        setVoteCount(0);
+      }
       
       // Fetch detailed votes for early voter badge
-      const votesRes = await API.get('/vote/my-votes');
-      setVotes(votesRes.data.votes || []);
+      try {
+        const votesRes = await API.get('/vote/my-votes');
+        setVotes(votesRes.data.votes || []);
+      } catch (err) {
+        console.error('Failed to fetch votes:', err);
+        setVotes([]);
+      }
       
       // Calculate security score (simplified - can use actual calculation)
-      const bioRes = await API.get('/biometric/status');
-      const bio = bioRes.data;
-      let score = 0;
-      if (bio?.registered) score += 30;
-      score += 50; // Assume email + wallet + activity = 70
-      setSecurityScore(score);
+      try {
+        const bioRes = await API.get('/biometric/status');
+        const bio = bioRes.data;
+        let score = 0;
+        if (bio?.registered && bio?.verified) score += 30;
+        score += 50; // Assume email + wallet + activity = 70
+        setSecurityScore(score);
+      } catch (err) {
+        console.error('Failed to fetch biometric status:', err);
+        setSecurityScore(50);
+      }
       
       setLoading(false);
     } catch (err) {
@@ -62,9 +77,20 @@ const VoterBadges = () => {
           </div>
         </div>
         
-        <span className="px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full text-sm font-medium text-yellow-400">
-          {badges.length} Earned
-        </span>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={fetchBadgeData}
+            title="Refresh badges"
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+          >
+            <svg className="w-5 h-5 text-gray-400 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+          </button>
+          <span className="px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full text-sm font-medium text-yellow-400">
+            {badges.length} Earned
+          </span>
+        </div>
       </div>
       
       {loading ? (

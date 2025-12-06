@@ -6,7 +6,7 @@
 export const calculateBadges = (voteCount, securityScore, votes = []) => {
   const badges = [];
   
-  // 🎖 Verified Voter
+  // 🎖 Verified Voter (security score 70+ indicates face verification + other factors)
   if (securityScore >= 70) {
     badges.push({
       id: 'verified_voter',
@@ -18,14 +18,26 @@ export const calculateBadges = (voteCount, securityScore, votes = []) => {
     });
   }
   
-  // 🏅 Regular Participant
-  if (voteCount >= 3) {
+  // 🏅 Regular Participant - vote in 1+ election
+  if (voteCount >= 1) {
+    badges.push({
+      id: 'participant',
+      name: 'Participant',
+      icon: '🏅',
+      description: 'Participated in 1+ election',
+      color: 'from-neon-purple to-neon-pink',
+      earned: true
+    });
+  }
+  
+  // 🎯 Regular Voter - vote in 2+ elections  
+  if (voteCount >= 2) {
     badges.push({
       id: 'regular_participant',
-      name: 'Regular Participant',
-      icon: '🏅',
-      description: 'Participated in 3+ elections',
-      color: 'from-neon-purple to-neon-pink',
+      name: 'Regular Voter',
+      icon: '⭐',
+      description: 'Participated in 2+ elections',
+      color: 'from-purple-400 to-pink-500',
       earned: true
     });
   }
@@ -54,7 +66,7 @@ export const calculateBadges = (voteCount, securityScore, votes = []) => {
   if (securityScore >= 80) {
     badges.push({
       id: 'high_security',
-      name: 'High Security Level',
+      name: 'High Security',
       icon: '🛡',
       description: 'Security score above 80',
       color: 'from-green-400 to-emerald-500',

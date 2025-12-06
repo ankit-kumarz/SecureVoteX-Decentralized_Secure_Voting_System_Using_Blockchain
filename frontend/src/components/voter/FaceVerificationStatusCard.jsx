@@ -35,7 +35,7 @@ const FaceVerificationStatusCard = () => {
     );
   }
   
-  const isVerified = biometricStatus?.registered === true;
+  const isVerified = biometricStatus?.registered === true && biometricStatus?.verified === true;
   
   return (
     <div className={`backdrop-blur-xl p-6 rounded-2xl border shadow-glow mb-6 ${

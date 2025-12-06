@@ -60,8 +60,8 @@ const getMyVotes = async (req, res) => {
       vote_id: vote.vote_id,
       voter_id: vote.voter_id,
       vote_timestamp: vote.vote_timestamp,
-      tx_hash: vote.tx_hash || vote.receipt_tx_hash,
       receipt_hash: vote.receipt_hash,
+      blockchain_tx: vote.blockchain_tx || vote.receipt_blockchain_tx,
       
       election: {
         id: vote.election_id,

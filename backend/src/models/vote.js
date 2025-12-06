@@ -50,7 +50,9 @@ const getDetailedVotesByVoter = async (voter_id) => {
       // Vote details
       'votes.id as vote_id',
       'votes.voter_id',
-      'votes.tx_hash',
+      'votes.encrypted_vote',
+      'votes.vote_salt',
+      'votes.blockchain_tx',
       'votes.created_at as vote_timestamp',
       
       // Election details
@@ -69,7 +71,7 @@ const getDetailedVotesByVoter = async (voter_id) => {
       
       // Receipt details
       'vote_receipts.receipt_hash',
-      'vote_receipts.tx_hash as receipt_tx_hash'
+      'vote_receipts.blockchain_tx as receipt_blockchain_tx'
     )
     .orderBy('votes.created_at', 'desc');
 };

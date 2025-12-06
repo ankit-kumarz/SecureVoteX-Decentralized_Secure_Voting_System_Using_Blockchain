@@ -34,7 +34,8 @@ const VoterDashboard = () => {
   const checkBiometricStatus = async () => {
     try {
       const response = await API.get('/biometric/status');
-      setFaceVerified(response.data.registered);
+      // Check if registered AND verified
+      setFaceVerified(response.data.registered === true && response.data.verified === true);
     } catch (err) {
       console.error('Failed to check biometric status:', err);
       setFaceVerified(false);
