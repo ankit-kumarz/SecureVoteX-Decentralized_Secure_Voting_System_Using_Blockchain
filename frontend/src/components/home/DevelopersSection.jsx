@@ -28,7 +28,7 @@ const DevelopersSection = () => {
       role: 'Frontend Developer, UI/UX Designer',
       bio: 'Akshita designed responsive interfaces, polished interactive layouts, improved accessibility, and ensured a professional user experience across SecureVoteX.',
       photo: '/assets/developers/dev3.png',
-      github: 'https://github.com/Akshita27-lab',
+      github: 'https://github.com/Akshitaag0708',
       linkedin: 'https://www.linkedin.com/in/akshitaagarwal78/',
       gradient: 'from-pink-500 to-rose-500',
       icon: '🎨'
