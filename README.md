@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # SecureVoteX - Blockchain Voting Platform
 
 ## 📋 Table of Contents
