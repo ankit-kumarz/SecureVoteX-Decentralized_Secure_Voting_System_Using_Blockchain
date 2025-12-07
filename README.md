@@ -1638,10 +1638,10 @@ SOFTWARE.
 
 ## 📞 Support
 
-- **Documentation**: [https://docs.securevotex.com](https://docs.securevotex.com)
-- **Issues**: [GitHub Issues](https://github.com/your-org/securevotex/issues)
-- **Email**: support@securevotex.com
-- **Discord**: [Join Community](https://discord.gg/securevotex)
+- **Documentation**: [https://github.com/ankit-kumarz/SecureVoteX-Decentralized_Secure_Voting_System_Using_Blockchain/edit/main/README.md]
+- **Issues**: [GitHub Issues](https://github.com/ankit-kumarz/SecureVoteX-Decentralized_Secure_Voting_System_Using_Blockchain/issues)
+- **Email**: [ankitrajj1068@gmail.com]
+
 
 ---
 
@@ -1655,9 +1655,15 @@ SOFTWARE.
 
 ---
 
+## Team SecureVotex:
+- **Backend & System Developer** - Ankit Kumar [https://github.com/ankit-kumarz/]
+- **Frontend Developer** - Akshita Agarwal
+- **Blockchain Developer**- Akshat Jain [https://github.com/17akshat05]
+
+  ---
+
 **Built with ❤️ for Democratic Governance**
 
 *SecureVoteX - Where Every Vote Counts, Verified on the Blockchain*
 =======
-# Decentralized_Secure_Voting_System_Using_Blockchain
->>>>>>> 2a49593608cfe9b83c9b2e2c5a2174e81f870d83
+
