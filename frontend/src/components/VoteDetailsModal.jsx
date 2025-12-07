@@ -122,10 +122,6 @@ const VoteDetailsModal = ({ isOpen, onClose, vote }) => {
               </svg>
             </button>
           </div>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/>
-              </svg>
-            </button>
-          </div>
 
           {/* Content */}
           <div ref={receiptRef} className="p-6 pb-32 space-y-6">
