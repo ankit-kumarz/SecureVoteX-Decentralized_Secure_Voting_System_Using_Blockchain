@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import html2pdf from 'html2pdf.js';
 
 /**
- * VoteDetailsModal Component - Full vote receipt modal
- * Displays complete vote information with download and blockchain explorer options
+ * VoteDetailsModal Component - Full vote receipt modal with download and blockchain explorer options
+ * Displays complete vote information with proper JSX structure
  */
 const VoteDetailsModal = ({ isOpen, onClose, vote }) => {
   const receiptRef = useRef(null);
