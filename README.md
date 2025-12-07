@@ -1,4 +1,4 @@
-# SecureVoteX - Blockchain Voting Platform
+# SecureVoteX - A Decentralized Secure Blockchain Voting Platform
 
 ## 📋 Table of Contents
 
