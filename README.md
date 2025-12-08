@@ -1,5 +1,8 @@
 # SecureVoteX - A Decentralized Secure Blockchain Voting Platform
 
+[![Try SecureVoteX](https://img.shields.io/badge/Try-SecureVoteX-purple?style=for-the-badge&logo=vercel)](https://securevotex.vercel.app/)
+
+
 ## 📋 Table of Contents
 
 - [Overview](#overview)
