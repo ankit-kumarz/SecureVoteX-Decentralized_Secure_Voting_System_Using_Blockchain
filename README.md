@@ -1,6 +1,6 @@
 # SecureVoteX - A Decentralized Secure Blockchain Voting Platform
 
-[![Try SecureVoteX](https://imgur.com/i7jOO39.png)](https://securevotex.vercel.app/)
+[![Try SecureVoteX](https://img.icons8.com/?size=160&id=QmVbXK7gycnu&format=png)](https://securevotex.vercel.app/)
 
 
 ## 📋 Table of Contents
