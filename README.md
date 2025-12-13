@@ -160,7 +160,7 @@ Vote Verification
 | Tailwind CSS | 3.4.3 | Styling framework |
 | Framer Motion | 11.1.7 | Animations |
 | face-api.js | 0.22.2 | Facial recognition |
-| Web3.js | 4.8.0 | Blockchain interaction |
+| Web3.js | 4.8.0 | Blockchain interaction | 
 | i18next | 23.11.3 | Internationalization |
 | Axios | 1.6.8 | HTTP client |
 | QRCode.react | 3.1.0 | QR code generation |
