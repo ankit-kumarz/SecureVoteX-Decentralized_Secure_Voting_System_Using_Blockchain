@@ -43,7 +43,7 @@
 
 ---
 
-## ✨ Features
+## ✨ Features 
 
 ### Voter Features
 - ✅ Biometric registration with facial recognition
