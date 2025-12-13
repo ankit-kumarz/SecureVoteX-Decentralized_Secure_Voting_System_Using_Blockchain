@@ -52,7 +52,7 @@
 - ✅ QR code vote receipts with blockchain verification
 - ✅ Real-time election results and analytics
 - ✅ Multi-language interface (English/Hindi)
-- ✅ Vote history and transparency dashboard
+- ✅ Vote history and transparency dashboard 
 
 ### Admin Features
 - ✅ Election management (Create, Update, Delete)
