@@ -204,7 +204,7 @@ Vote Verification
 - Ethereum Wallet (Sepolia testnet ETH)
 - Infura/Alchemy API Key (for blockchain RPC)
 - PostgreSQL database instance
-
+ 
 ---
 
 ## 🚀 Installation
