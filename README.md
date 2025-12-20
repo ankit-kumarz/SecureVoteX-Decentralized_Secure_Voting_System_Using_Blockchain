@@ -149,7 +149,7 @@ Vote Verification
 ```
 
 ---
-
+ 
 ## 🛠️ Technology Stack
 
 ### Frontend
