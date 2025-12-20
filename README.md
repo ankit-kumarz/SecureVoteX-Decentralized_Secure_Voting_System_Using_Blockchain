@@ -147,7 +147,7 @@ Vote Verification
 ├─> Verify Transaction
 └─> Display Vote Details
 ```
-
+ 
 ---
  
 ## 🛠️ Technology Stack
