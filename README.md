@@ -206,7 +206,7 @@ Vote Verification
 - PostgreSQL database instance
  
 ---
-
+ 
 ## 🚀 Installation
 
 ### 1. Clone Repository
