@@ -347,7 +347,7 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL,
   role VARCHAR(50) DEFAULT 'voter',
   admin_type VARCHAR(50),
-  voter_id VARCHAR(100) UNIQUE,
+  voter_id VARCHAR(100) UNIQUE, 
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
   is_temp_password BOOLEAN DEFAULT false,
