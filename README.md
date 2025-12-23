@@ -203,7 +203,7 @@ Vote Verification
 ### Required Accounts
 - Ethereum Wallet (Sepolia testnet ETH)
 - Infura/Alchemy API Key (for blockchain RPC)
-- PostgreSQL database instance 
+- PostgreSQL database instance  
  
 ---
  
