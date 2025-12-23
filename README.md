@@ -78,7 +78,7 @@
 - ✅ AES-256-GCM encryption for votes
 - ✅ RSA-4096 key pair generation per election
 - ✅ JWT-based authentication
-- ✅ bcrypt password hashing (10 rounds)
+- ✅ bcrypt password hashing (10 rounds) 
 - ✅ SQL injection prevention (parameterized queries) 
 - ✅ XSS protection with React
 - ✅ CORS configuration
