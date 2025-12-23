@@ -51,7 +51,7 @@
 - ✅ End-to-end encrypted voting
 - ✅ QR code vote receipts with blockchain verification
 - ✅ Real-time election results and analytics
-- ✅ Multi-language interface (English/Hindi)
+- ✅ Multi-language interface (English/Hindi) 
 - ✅ Vote history and transparency dashboard 
 
 ### Admin Features
