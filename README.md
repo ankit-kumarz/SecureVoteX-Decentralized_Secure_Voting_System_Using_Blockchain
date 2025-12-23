@@ -209,7 +209,7 @@ Vote Verification
  
 ## 🚀 Installation
 
-### 1. Clone Repository
+### 1. Clone Repository 
 
 ```bash
 git clone https://github.com/your-org/securevotex.git
