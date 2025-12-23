@@ -126,7 +126,7 @@ User Registration
 
 User Login
 │
-├─> Email/Password Verification (bcrypt)
+├─> Email/Password Verification (bcrypt) 
 ├─> Face Verification (Cosine Similarity)
 ├─> Generate JWT Token
 └─> Access Dashboard
