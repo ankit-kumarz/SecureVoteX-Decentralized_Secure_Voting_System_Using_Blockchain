@@ -294,7 +294,7 @@ REACT_APP_CONTRACT_ADDRESS=deployed_contract_address_after_deployment
 REACT_APP_ETHERSCAN_API_KEY=your_etherscan_api_key
 REACT_APP_ETHERSCAN_URL=https://sepolia.etherscan.io
 ```
-
+ 
 ### Generate Secure Keys
 
 ```bash
