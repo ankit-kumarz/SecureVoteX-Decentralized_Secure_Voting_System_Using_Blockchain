@@ -167,7 +167,7 @@ Vote Verification
 | Chart.js | 4.4.2 | Data visualization |
 
 ### Backend
-| Technology | Version | Purpose |
+| Technology | Version | Purpose | 
 |------------|---------|---------|
 | Node.js | 18+ | Runtime environment |
 | Express.js | 4.19.2 | Web framework |
