@@ -198,7 +198,7 @@ Vote Verification
 - **npm**: v9.0.0 or higher
 - **PostgreSQL**: v14.0 or higher
 - **Git**: v2.30 or higher
-- **MetaMask**: Browser extension (for blockchain testing)
+- **MetaMask**: Browser extension (for blockchain testing) 
 
 ### Required Accounts
 - Ethereum Wallet (Sepolia testnet ETH)
