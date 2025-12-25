@@ -177,7 +177,7 @@ Vote Verification
 | jsonwebtoken | 9.0.2 | JWT authentication |
 | crypto (Node.js) | Built-in | Encryption utilities |
 | Multer | 1.4.5 | File uploads |
-| dotenv | 16.4.5 | Environment variables |
+| dotenv | 16.4.5 | Environment variables | 
 | cors | 2.8.5 | Cross-Origin Resource Sharing |
 
 ### Blockchain
