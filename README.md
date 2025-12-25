@@ -184,7 +184,7 @@ Vote Verification
 | Technology | Version | Purpose |
 |------------|---------|---------|
 | Solidity | 0.8.19 | Smart contract language |
-| Hardhat | 2.22.3 | Development environment |
+| Hardhat | 2.22.3 | Development environment | 
 | Ethers.js | 6.11.1 | Ethereum library |
 | OpenZeppelin | 5.0.2 | Secure contract templates |
 | Ethereum Sepolia | Testnet | Testing blockchain |
