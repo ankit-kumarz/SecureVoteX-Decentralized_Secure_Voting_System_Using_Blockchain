@@ -168,7 +168,7 @@ Vote Verification
 
 ### Backend
 | Technology | Version | Purpose | 
-|------------|---------|---------|
+|------------|---------|---------| 
 | Node.js | 18+ | Runtime environment |
 | Express.js | 4.19.2 | Web framework |
 | PostgreSQL | 14+ | Database |
