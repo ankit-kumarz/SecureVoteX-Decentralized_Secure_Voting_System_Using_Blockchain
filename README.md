@@ -163,7 +163,7 @@ Vote Verification
 | Web3.js | 4.8.0 | Blockchain interaction | 
 | i18next | 23.11.3 | Internationalization |
 | Axios | 1.6.8 | HTTP client |
-| QRCode.react | 3.1.0 | QR code generation |
+| QRCode.react | 3.1.0 | QR code generation | 
 | Chart.js | 4.4.2 | Data visualization |
 
 ### Backend
