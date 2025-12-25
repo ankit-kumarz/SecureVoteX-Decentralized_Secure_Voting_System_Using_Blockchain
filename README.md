@@ -239,7 +239,7 @@ powershell -ExecutionPolicy Bypass -File download-models.ps1
 
 ---
 
-## ⚙️ Configuration
+## ⚙️ Configuration 
 
 ### Backend Environment Variables
 
