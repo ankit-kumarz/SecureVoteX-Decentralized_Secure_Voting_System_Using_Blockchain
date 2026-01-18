@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AIChatbot = () => {
@@ -7,6 +7,7 @@ const AIChatbot = () => {
     { type: 'bot', text: 'Hello! I\'m SecureVoteX AI Assistant. How can I help you today?' }
   ]);
   const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef(null);
 
   const predefinedQuestions = [
     "How does voting work?",
@@ -35,6 +36,11 @@ const AIChatbot = () => {
     return responses[question] || "I'm here to help! Please select one of the predefined questions above, or contact our support team for detailed assistance.";
   };
 
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isTyping]);
+
   const handleQuestionClick = (question) => {
     // Add user message
     setMessages(prev => [...prev, { type: 'user', text: question }]);
@@ -54,7 +60,7 @@ const AIChatbot = () => {
       {/* Floating Button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full shadow-2xl flex items-center justify-center text-white text-2xl hover:scale-110 transition-transform"
+        className="fixed bottom-6 right-6 z-50 w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full shadow-2xl shadow-purple-500/50 flex items-center justify-center text-white text-2xl hover:scale-110 transition-transform"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         initial={{ scale: 0 }}
@@ -72,7 +78,7 @@ const AIChatbot = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 100, scale: 0.3 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-24 right-6 z-40 w-96 h-[600px] backdrop-blur-2xl bg-gradient-to-b from-navy-800/95 to-navy-900/95 rounded-3xl border border-white/20 shadow-2xl flex flex-col overflow-hidden"
+            className="fixed bottom-28 right-6 z-40 w-96 h-[600px] backdrop-blur-2xl bg-gradient-to-b from-navy-800/95 to-navy-900/95 rounded-3xl border border-white/20 shadow-2xl shadow-purple-500/30 flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 flex items-center gap-3">
@@ -86,7 +92,7 @@ const AIChatbot = () => {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar" ref={messagesEndRef}>
               {messages.map((msg, index) => (
                 <motion.div
                   key={index}
@@ -135,6 +141,7 @@ const AIChatbot = () => {
                   </div>
                 </motion.div>
               )}
+              <div ref={messagesEndRef} />
             </div>
 
             {/* Predefined Questions */}
