@@ -143,11 +143,27 @@ const getActiveElections = async (req, res) => {
     const now = new Date();
     const elections = await electionModel.getAllElections();
     
+    console.log('🔍 Checking active elections:', {
+      now: now.toISOString(),
+      totalElections: elections.length
+    });
+    
     const activeElections = elections.filter(e => {
       const start = new Date(e.start_date);
       const end = new Date(e.end_date);
-      return start <= now && now <= end;
+      const isActive = start <= now && now <= end;
+      
+      console.log(`Election "${e.title}":`, {
+        start: start.toISOString(),
+        end: end.toISOString(),
+        isActive,
+        reason: isActive ? 'ACTIVE' : (start > now ? 'NOT_STARTED' : 'ENDED')
+      });
+      
+      return isActive;
     });
+    
+    console.log('✅ Active elections found:', activeElections.length);
     
     res.json({
       success: true,

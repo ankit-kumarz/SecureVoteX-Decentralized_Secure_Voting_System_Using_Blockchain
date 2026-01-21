@@ -25,9 +25,11 @@ const registerBiometric = async (req, res) => {
     const existingProfile = await voterProfileModel.hasVoterProfile(userId);
     if (existingProfile) {
       // Update existing profile instead of failing
+      const faceHash = createHmacHash(faceEmbeddingBase64);
       await voterProfileModel.updateVoterProfile(userId, {
-        biometric_data: faceEmbeddingBase64,
-        is_verified: true
+        embedding_encrypted: faceEmbeddingBase64,
+        embedding_salt: 'none',
+        face_hash: faceHash
       });
       return res.status(200).json({
         message: 'Biometric profile updated',
@@ -36,10 +38,12 @@ const registerBiometric = async (req, res) => {
     }
 
     // Create new biometric profile
+    const faceHash = createHmacHash(faceEmbeddingBase64);
     const profile = {
       user_id: userId,
-      biometric_data: faceEmbeddingBase64,
-      is_verified: true
+      embedding_encrypted: faceEmbeddingBase64,
+      embedding_salt: 'none',
+      face_hash: faceHash
     };
 
     await voterProfileModel.createVoterProfile(profile);
@@ -70,13 +74,13 @@ const verifyBiometric = async (req, res) => {
     }
 
     // Return the stored biometric data
-    const storedEmbedding = profile.biometric_data;
+    const storedEmbedding = profile.embedding_encrypted;
     
     // Send descriptor to client for comparison
     res.json({
       success: true,
       storedEmbedding: storedEmbedding,
-      isVerified: profile.is_verified,
+      isVerified: true,
       message: 'Biometric data retrieved successfully'
     });
   } catch (err) {
