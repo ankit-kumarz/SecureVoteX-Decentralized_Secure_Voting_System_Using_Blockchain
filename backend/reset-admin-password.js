@@ -5,8 +5,8 @@ const knex = require('knex')(require('./knexfile').development);
 
 async function resetAdminPassword() {
   try {
-    const email = 'superadmin@securevotex.com';
-    const newPassword = 'Admin@123';
+    const email = 'admin@votex.com';
+    const newPassword = 'Ankit@108';
 
     console.log('🔍 Looking for superadmin...');
     const admin = await knex('users').where({ email }).first();
