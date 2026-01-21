@@ -10,9 +10,12 @@ const adminController = require('../controllers/adminController');
  */
 const getAdminStats = async (req, res) => {
   try {
-    // Total elections - handle empty result
+    console.log('📊 Fetching admin stats...');
+    
+    // Total elections - handle empty result and convert to integer
     const electionResult = await db('elections').count('* as count').first();
-    const totalElections = electionResult?.count || 0;
+    const totalElections = parseInt(electionResult?.count || 0);
+    console.log('Total elections:', totalElections);
     
     // Active elections today
     const now = new Date();
@@ -21,37 +24,42 @@ const getAdminStats = async (req, res) => {
       .where('end_date', '>=', now)
       .count('* as count')
       .first();
-    const activeCount = activeResult?.count || 0;
+    const activeCount = parseInt(activeResult?.count || 0);
+    console.log('Active elections:', activeCount);
     
     // Total registered voters
     const voterResult = await db('users')
       .where('role', 'voter')
       .count('* as count')
       .first();
-    const totalVoters = voterResult?.count || 0;
+    const totalVoters = parseInt(voterResult?.count || 0);
+    console.log('Total voters:', totalVoters);
     
     // Total votes cast
     const votesResult = await db('votes').count('* as count').first();
-    const totalVotes = votesResult?.count || 0;
+    const totalVotes = parseInt(votesResult?.count || 0);
+    console.log('Total votes:', totalVotes);
     
     // Votes pending blockchain sync
     const pendingResult = await db('votes')
-      .whereNull('blockchain_tx')
+      .whereNull('tx_hash')
       .count('* as count')
       .first();
-    const pendingSync = pendingResult?.count || 0;
+    const pendingSync = parseInt(pendingResult?.count || 0);
+    console.log('Pending sync:', pendingSync);
     
-    // Face-verified voters
+    // Face-verified voters - use correct column name
     const verifiedResult = await db('voter_profiles')
-      .whereNotNull('biometric_data')
+      .whereNotNull('embedding_encrypted')
       .count('* as count')
       .first();
-    const verifiedVoters = verifiedResult?.count || 0;
+    const verifiedVoters = parseInt(verifiedResult?.count || 0);
+    console.log('Verified voters:', verifiedVoters);
     
     // System alerts count
     const alertsCount = 0;
     
-    res.json({
+    const statsResponse = {
       success: true,
       stats: {
         totalElections,
@@ -62,9 +70,12 @@ const getAdminStats = async (req, res) => {
         faceVerifiedVoters: verifiedVoters,
         systemAlerts: alertsCount
       }
-    });
+    };
+    
+    console.log('✅ Stats response:', statsResponse);
+    res.json(statsResponse);
   } catch (error) {
-    console.error('Failed to fetch admin stats:', error);
+    console.error('❌ Failed to fetch admin stats:', error);
     res.status(500).json({ message: 'Failed to fetch statistics', error: error.message });
   }
 };
