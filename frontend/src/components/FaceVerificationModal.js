@@ -34,6 +34,13 @@ const FaceVerificationModal = ({ isOpen, onClose, onVerified, onFailed, userId }
       setError('');
       setHasBiometric(null);
       setCheckingStatus(true);
+      
+      // Stop all video streams to release camera
+      navigator.mediaDevices?.getUserMedia({ video: true })
+        .then(stream => {
+          stream.getTracks().forEach(track => track.stop());
+        })
+        .catch(() => {});
     }
   }, [isOpen]);
 

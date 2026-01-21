@@ -30,10 +30,11 @@ exports.up = function(knex) {
       table.increments('id').primary();
       table.integer('election_id').unsigned().references('id').inTable('elections').onDelete('CASCADE');
       table.integer('candidate_id').unsigned().references('id').inTable('candidates').onDelete('CASCADE');
-      table.string('voter_id').references('voter_id').inTable('users');
+      table.string('voter_id').notNullable(); // Store voter_id without foreign key constraint
       table.string('tx_hash');
       table.timestamp('created_at').defaultTo(knex.fn.now());
       table.unique(['election_id', 'voter_id']);
+      table.index('voter_id'); // Add index for performance
     });
 };
 
