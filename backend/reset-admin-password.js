@@ -1,18 +1,25 @@
-// Reset superadmin password to a known value
+// Reset superadmin password using environment variables
 require('dotenv').config();
 const bcrypt = require('bcrypt');
 const knex = require('knex')(require('./knexfile').development);
 
 async function resetAdminPassword() {
   try {
-    const email = 'admin@votex.com';
-    const newPassword = 'Ankit@108';
+    // Get credentials from environment variables (NEVER hardcode)
+    const email = process.env.ADMIN_EMAIL;
+    const newPassword = process.env.ADMIN_PASSWORD;
 
-    console.log('🔍 Looking for superadmin...');
+    if (!email || !newPassword) {
+      console.error('❌ Error: ADMIN_EMAIL and ADMIN_PASSWORD environment variables not set!');
+      console.error('Set these in your Render dashboard Environment section.');
+      process.exit(1);
+    }
+
+    console.log('🔍 Looking for admin with email:', email);
     const admin = await knex('users').where({ email }).first();
 
     if (!admin) {
-      console.log('❌ Superadmin not found! Creating new one...');
+      console.log('❌ Admin not found! Creating new one...');
       
       // Create new admin if doesn't exist
       const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -25,9 +32,9 @@ async function resetAdminPassword() {
         updated_at: new Date()
       });
 
-      console.log('✅ Superadmin created successfully!');
+      console.log('✅ Admin created successfully!');
     } else {
-      console.log('✅ Superadmin found, resetting password...');
+      console.log('✅ Admin found, resetting password...');
       
       // Update password
       const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -39,13 +46,7 @@ async function resetAdminPassword() {
       console.log('✅ Password reset successfully!');
     }
 
-    console.log('\n═══════════════════════════════════════');
-    console.log('  SUPERADMIN CREDENTIALS');
-    console.log('═══════════════════════════════════════');
-    console.log('  Email:    ' + email);
-    console.log('  Password: ' + newPassword);
-    console.log('═══════════════════════════════════════\n');
-
+    console.log('\n✅ Admin credentials updated (check Render environment variables for details)');
     process.exit(0);
   } catch (error) {
     console.error('❌ Error:', error.message);
