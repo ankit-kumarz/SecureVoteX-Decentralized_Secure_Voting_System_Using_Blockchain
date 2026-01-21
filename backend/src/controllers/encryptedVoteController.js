@@ -89,6 +89,22 @@ const castEncryptedVote = async (req, res) => {
       return res.status(400).json({ message: 'User information not found in token' });
     }
 
+    // Verify user exists in database
+    const userModel = require('../models/user');
+    const user = await userModel.getUserById(userId);
+    if (!user) {
+      console.log('❌ User not found in database:', userId);
+      return res.status(404).json({ message: 'User account not found. Please log in again.' });
+    }
+
+    // Verify voter_id matches
+    if (user.voter_id !== voterId) {
+      console.log('❌ Voter ID mismatch:', { tokenVoterId: voterId, dbVoterId: user.voter_id });
+      return res.status(400).json({ message: 'Voter ID mismatch. Please log in again.' });
+    }
+
+    console.log('✅ User verified:', { userId, voterId });
+
     // Check if election exists and is active
     const election = await electionModel.getElectionById(electionId);
     if (!election) {
