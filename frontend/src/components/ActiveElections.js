@@ -12,16 +12,22 @@ const ActiveElections = () => {
 
   const fetchElections = async () => {
     try {
-      // Try new active-elections endpoint first
-      const res = await API.get('/election/active-elections');
+      // Use correct endpoint path
+      const res = await API.get('/elections/active-elections');
+      console.log('Active elections response:', res.data);
       setElections(res.data.elections || []);
     } catch (err) {
-      console.error('Failed to fetch active elections:', err);
+      console.error('Failed to fetch active elections:', err.response?.data || err.message);
       // Fallback to old method
       try {
         const res = await API.get('/elections');
         const now = new Date();
-        const active = res.data.filter(e => new Date(e.start_date) <= now && new Date(e.end_date) >= now);
+        const active = res.data.filter(e => {
+          const start = new Date(e.start_date);
+          const end = new Date(e.end_date);
+          return start <= now && now <= end;
+        });
+        console.log('Fallback active elections:', active);
         setElections(active);
       } catch (fallbackErr) {
         console.error('Fallback also failed:', fallbackErr);
