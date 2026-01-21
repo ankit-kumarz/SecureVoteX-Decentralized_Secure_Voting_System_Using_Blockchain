@@ -1,5 +1,5 @@
 const voterProfileModel = require('../models/voterProfile');
-const { createHmacHash } = require('../utils/encryption');
+const { sha256Hash } = require('../utils/encryption');
 
 /**
  * Biometric Registration & Verification Controller
@@ -25,7 +25,7 @@ const registerBiometric = async (req, res) => {
     const existingProfile = await voterProfileModel.hasVoterProfile(userId);
     if (existingProfile) {
       // Update existing profile instead of failing
-      const faceHash = createHmacHash(faceEmbeddingBase64);
+      const faceHash = sha256Hash(faceEmbeddingBase64);
       await voterProfileModel.updateVoterProfile(userId, {
         embedding_encrypted: faceEmbeddingBase64,
         embedding_salt: 'none',
@@ -38,7 +38,7 @@ const registerBiometric = async (req, res) => {
     }
 
     // Create new biometric profile
-    const faceHash = createHmacHash(faceEmbeddingBase64);
+    const faceHash = sha256Hash(faceEmbeddingBase64);
     const profile = {
       user_id: userId,
       embedding_encrypted: faceEmbeddingBase64,
