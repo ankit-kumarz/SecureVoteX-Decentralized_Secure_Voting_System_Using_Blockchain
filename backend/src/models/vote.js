@@ -30,12 +30,13 @@ const getVotesByVoter = async (voter_id) => {
 const getDetailedVotesByVoter = async (voter_id) => {
   // voter_id is a string like "VOTER-xxx"
   return db('votes')
-    .distinct('votes.id')  // Get distinct votes to avoid duplicates from leftJoin
     .where('votes.voter_id', voter_id)
     .join('elections', 'votes.election_id', 'elections.id')
     .join('candidates', 'votes.candidate_id', 'candidates.id')
     .leftJoin('vote_receipts', function() {
-      this.on('vote_receipts.vote_id', '=', 'votes.id');
+      // Join on user_id and election_id since vote_receipts doesn't have vote_id
+      this.on('vote_receipts.election_id', '=', 'votes.election_id')
+          .andOn('vote_receipts.user_id', '=', db.raw('(SELECT id FROM users WHERE voter_id = ?)', [voter_id]));
     })
     .select(
       // Vote details
@@ -61,7 +62,7 @@ const getDetailedVotesByVoter = async (voter_id) => {
       
       // Receipt details
       'vote_receipts.receipt_hash',
-      'vote_receipts.blockchain_tx as receipt_blockchain_tx'
+      'vote_receipts.tx_hash as receipt_tx_hash'
     )
     .orderBy('votes.created_at', 'desc');
 };

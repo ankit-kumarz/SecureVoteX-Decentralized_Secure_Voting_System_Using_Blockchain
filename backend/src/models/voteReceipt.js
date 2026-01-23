@@ -37,11 +37,16 @@ const deleteVoteReceipt = async (receipt_hash) => {
   return db('vote_receipts').where({ receipt_hash }).del();
 };
 
+const updateVoteReceipt = async (id, updates) => {
+  return db('vote_receipts').where({ id }).update(updates).returning('*');
+};
+
 module.exports = {
   createVoteReceipt,
   getVoteReceiptByHash,
   getVoteReceiptsByUserId,
   getVoteReceiptsByElection,
   hasVoteReceipt,
-  deleteVoteReceipt
+  deleteVoteReceipt,
+  updateVoteReceipt
 };

@@ -177,6 +177,26 @@ const castEncryptedVote = async (req, res) => {
     });
     console.log('✅ Receipt created:', receipt.id);
 
+    // Record vote on blockchain
+    console.log('🔗 Recording vote on blockchain...');
+    try {
+      const { recordVoteOnBlockchain } = require('../utils/blockchain');
+      const blockchainTx = await recordVoteOnBlockchain({
+        electionId,
+        candidateId,
+        voterId,
+        receiptHash
+      });
+      
+      if (blockchainTx) {
+        console.log('✅ Blockchain TX recorded:', blockchainTx);
+        // Update vote receipt with blockchain tx
+        await voteReceiptModel.updateVoteReceipt(receipt.id, { tx_hash: blockchainTx });
+      }
+    } catch (blockchainErr) {
+      console.warn('⚠️ Blockchain recording failed (vote still valid):', blockchainErr.message);
+    }
+
     // Return receipt information
     console.log('✅ Vote cast successfully');
     res.status(201).json({
