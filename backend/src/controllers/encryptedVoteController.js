@@ -170,7 +170,6 @@ const castEncryptedVote = async (req, res) => {
     // Create vote receipt
     console.log('📜 Creating vote receipt...');
     const [receipt] = await voteReceiptModel.createVoteReceipt({
-      vote_id: vote.id,
       user_id: userId,
       election_id: electionId,
       receipt_hash: receiptHash,
