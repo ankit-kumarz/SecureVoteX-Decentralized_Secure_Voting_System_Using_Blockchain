@@ -174,7 +174,7 @@ const castEncryptedVote = async (req, res) => {
       user_id: userId,
       election_id: electionId,
       receipt_hash: receiptHash,
-      blockchain_tx: null // Will be updated when blockchain tx is recorded
+      tx_hash: null // Will be updated when blockchain tx is recorded
     });
     console.log('✅ Receipt created:', receipt.id);
 
