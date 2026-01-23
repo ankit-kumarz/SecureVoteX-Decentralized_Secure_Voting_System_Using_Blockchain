@@ -161,7 +161,7 @@ const castEncryptedVote = async (req, res) => {
     const [vote] = await voteModel.castVote({
       election_id: electionId,
       candidate_id: candidateId,
-      voter_id: userId,  // Use integer user ID, not string voter_id
+      voter_id: voterId,  // Use string voter_id like "VOTER-xxx"
       encrypted_vote: encryptedVote,
       vote_salt: voteSalt
     });
