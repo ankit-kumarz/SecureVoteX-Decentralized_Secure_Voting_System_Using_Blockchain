@@ -10,13 +10,8 @@ const castVoteWithTx = async (vote, tx_hash) => {
 };
 
 const hasVoted = async (voter_id, election_id) => {
-  // voter_id is a string like "VOTER-xxx", but we need to check using user record
-  // Get the user ID from the voter_id first
-  const user = await db('users').where({ voter_id }).select('id').first();
-  if (!user) {
-    return false; // User not found, so hasn't voted
-  }
-  return db('votes').where({ voter_id: user.id, election_id }).first();
+  // voter_id is a string like "VOTER-xxx"
+  return db('votes').where({ voter_id, election_id }).first();
 };
 
 const getVotesByElection = async (election_id) => {
@@ -24,10 +19,8 @@ const getVotesByElection = async (election_id) => {
 };
 
 const getVotesByVoter = async (voter_id) => {
-  // voter_id is a string like "VOTER-xxx", get the user ID first
-  const user = await db('users').where({ voter_id }).select('id').first();
-  if (!user) return [];
-  return db('votes').where({ voter_id: user.id }).orderBy('created_at', 'desc');
+  // voter_id is a string like "VOTER-xxx"
+  return db('votes').where({ voter_id }).orderBy('created_at', 'desc');
 };
 
 /**
@@ -35,12 +28,10 @@ const getVotesByVoter = async (voter_id) => {
  * Returns enriched data for beautiful UI display
  */
 const getDetailedVotesByVoter = async (voter_id) => {
-  // voter_id is a string like "VOTER-xxx", get the user ID first
-  const user = await db('users').where({ voter_id }).select('id').first();
-  if (!user) return [];
+  // voter_id is a string like "VOTER-xxx"
   return db('votes')
     .distinct('votes.id')  // Get distinct votes to avoid duplicates from leftJoin
-    .where('votes.voter_id', user.id)
+    .where('votes.voter_id', voter_id)
     .join('elections', 'votes.election_id', 'elections.id')
     .join('candidates', 'votes.candidate_id', 'candidates.id')
     .leftJoin('vote_receipts', function() {
@@ -52,7 +43,6 @@ const getDetailedVotesByVoter = async (voter_id) => {
       'votes.voter_id',
       'votes.encrypted_vote',
       'votes.vote_salt',
-      'votes.blockchain_tx',
       'votes.created_at as vote_timestamp',
       
       // Election details
